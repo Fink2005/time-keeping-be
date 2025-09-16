@@ -26,7 +26,7 @@ export class HealthController {
     return this.health.check([
       () => this.http.pingCheck('local-server', `http://20.17.97.172`),
 
-      // Kiểm tra DB bằng Prisma
+      // Kiểm tra DB bằng Prism
       // test
       async () => {
         try {

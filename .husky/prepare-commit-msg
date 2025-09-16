@@ -1,9 +1,3 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
-
-# $1 = commit message file
-if [ -t 1 ]; then
-  exec < /dev/tty
-  # Ghi trực tiếp commit message vào file $1
-  npx cz --hook "$1" || true
-fi
+# Không cần gì thêm ở đây
