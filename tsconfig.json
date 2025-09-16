@@ -1,4 +1,5 @@
 {
+  "exclude": ["commitlint.config.cjs"],
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
@@ -7,6 +8,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2023",
+    "esModuleInterop": true, // for dont need use * as
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
@@ -17,6 +19,5 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  },
-  "exclude": ["commitlint.config.cjs"]
+  }
 }

@@ -4,7 +4,7 @@ import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { SharedModule } from 'src/shared/shared.module';
 import { HealthController } from './health.controller';
-
+//  xin chao
 @Module({
   imports: [TerminusModule, SharedModule, HttpModule],
   controllers: [HealthController],
