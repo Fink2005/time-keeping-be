@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // src/health/health.controller.ts
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -26,6 +27,7 @@ export class HealthController {
       () => this.http.pingCheck('local-server', `http://20.17.97.172`),
 
       // Kiểm tra DB bằng Prisma
+      // test
       async () => {
         try {
           await this.prisma.$queryRaw`SELECT 1`;

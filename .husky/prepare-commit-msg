@@ -1,5 +1,4 @@
 
-
 # $1 là file commit message, $2 là commit type (commit, merge, squash, etc)
 # commitizen sẽ ghi message vào $1
 if [ -t 1 ]; then
