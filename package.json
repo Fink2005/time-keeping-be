@@ -42,14 +42,12 @@
     "rxjs": "^7.8.1",
     "zod": "^4.1.8"
   },
-"lint-staged": {
-  "*.{js,ts,tsx}": [
-    "eslint --fix",
-    "prettier --write"
-  ]
-}
-,
-
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
   "devDependencies": {
     "@commitlint/cli": "^19.8.1",
     "@commitlint/config-conventional": "^19.8.1",

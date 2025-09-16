@@ -1,1 +1,10 @@
-cd "$(dirname "$0")/.." && npx --no -- commitlint --edit $1
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# $1 = commit message file
+if [ -t 1 ]; then
+  exec < /dev/tty
+  npx cz --hook "$1" || true
+fi
+
+npx commitlint --edit "$1"

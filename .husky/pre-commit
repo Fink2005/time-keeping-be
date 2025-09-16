@@ -1,1 +1,4 @@
-cd "$(dirname "$0")/.." && npx --no lint-staged --concurrent false
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+npx lint-staged --concurrent false
