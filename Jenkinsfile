@@ -8,7 +8,11 @@ pipeline {
     stages {
         stage('Checkout & Build NestJS') {
             steps {
-                git branch: 'main', url: 'https://github.com/Fink2005/time-keeping-be.git'
+                git(
+                    branch: 'main',
+                    url: 'https://github.com/Fink2005/time-keeping-be.git',
+                    credentialsId: 'github-pat'  // <-- thêm dòng này
+                )
                 sh 'pnpm install'
                 sh 'pnpm build'
             }
