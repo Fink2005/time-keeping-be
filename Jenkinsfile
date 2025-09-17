@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'tira-be'
-        PATH = "/usr/local/bin:$PATH" // đảm bảo Node/NPM/pnpm nằm trong PATH
+        PATH = "/usr/bin:/usr/local/bin:$PATH" // đảm bảo Node/NPM/pnpm nhận diện được
     }
 
     stages {
@@ -16,30 +16,33 @@ pipeline {
                     credentialsId: 'github-pat'
                 )
 
-                // Check Node/NPM/pnpm
+                // Check Node/NPM/pnpm và build dự án
                 sh '''
+                # Kiểm tra Node
                 if ! command -v node > /dev/null; then
                     echo "Node.js not found! Please install Node.js on agent."
                     exit 1
                 fi
 
+                # Kiểm tra npm
                 if ! command -v npm > /dev/null; then
                     echo "npm not found! Please install npm on agent."
                     exit 1
                 fi
 
+                # Cài pnpm nếu chưa có
                 if ! command -v pnpm > /dev/null; then
                     echo "Installing pnpm..."
                     npm install -g pnpm
                 else
                     echo "pnpm already installed"
                 fi
-                '''
 
-                // Build dự án
-                sh 'pnpm install'
-                sh 'pnpm prisma generate'
-                sh 'pnpm build'
+                # Build project
+                pnpm install
+                pnpm prisma generate
+                pnpm build
+                '''
             }
         }
 
@@ -63,7 +66,7 @@ pipeline {
             steps {
                 sshagent(['vps-ssh-credential-id']) {
                     script {
-                        // Check credential tồn tại trước khi deploy
+                        // Check credentials tồn tại trước khi deploy
                         if (!Jenkins.instance.getCredentials().find { it.id == 'telegram-token' }) {
                             error "Credential 'telegram-token' not found in Jenkins!"
                         }
