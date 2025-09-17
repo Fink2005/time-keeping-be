@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'tira-be'
-        PATH = "/usr/bin:/usr/local/bin:$PATH" // đảm bảo Node/NPM/pnpm nhận diện được
+        PATH = "/usr/bin:/usr/local/bin:$PATH" // đảm bảo Node/NPM nhận diện
     }
 
     stages {
@@ -16,37 +16,39 @@ pipeline {
                     credentialsId: 'github-pat'
                 )
 
-                // Check Node/NPM/pnpm và build dự án
-                sh '''
-                # Kiểm tra Node
-                if ! command -v node > /dev/null; then
-                    echo "Node.js not found! Please install Node.js on agent."
-                    exit 1
-                fi
+                // Build dự án với pnpm local (npx)
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh '''
+                    # Kiểm tra Node
+                    if ! command -v node > /dev/null; then
+                        echo "Node.js not found! Please install Node.js on agent."
+                        exit 1
+                    fi
 
-                # Kiểm tra npm
-                if ! command -v npm > /dev/null; then
-                    echo "npm not found! Please install npm on agent."
-                    exit 1
-                fi
+                    # Kiểm tra npm
+                    if ! command -v npm > /dev/null; then
+                        echo "npm not found! Please install npm on agent."
+                        exit 1
+                    fi
 
-                # Cài pnpm nếu chưa có
-                if ! command -v pnpm > /dev/null; then
-                    echo "Installing pnpm..."
-                    npm install -g pnpm
-                else
-                    echo "pnpm already installed"
-                fi
+                    # Cài pnpm local nếu chưa có trong node_modules
+                    if [ ! -d node_modules/.pnpm ]; then
+                        npm install pnpm --save-dev
+                    fi
 
-                # Build project
-                pnpm install
-                pnpm prisma generate
-                pnpm build
-                '''
+                    # Dùng npx để chạy pnpm
+                    npx pnpm install
+                    npx pnpm prisma generate
+                    npx pnpm build
+                    '''
+                }
             }
         }
 
         stage('Docker Build & Push') {
+            when {
+                expression { currentBuild.currentResult == 'SUCCESS' }
+            }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-cred',
@@ -65,24 +67,14 @@ pipeline {
         stage('Deploy to VPS') {
             steps {
                 sshagent(['vps-ssh-credential-id']) {
-                    script {
-                        // Check credentials tồn tại trước khi deploy
-                        if (!Jenkins.instance.getCredentials().find { it.id == 'telegram-token' }) {
-                            error "Credential 'telegram-token' not found in Jenkins!"
-                        }
-                        if (!Jenkins.instance.getCredentials().find { it.id == 'telegram-chat-id' }) {
-                            error "Credential 'telegram-chat-id' not found in Jenkins!"
-                        }
-
-                        withCredentials([
-                            string(credentialsId: 'vps-credential', variable: 'VPS'),
-                            string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN'),
-                            string(credentialsId: 'telegram-chat-id', variable: 'TELEGRAM_CHAT_ID')
-                        ]) {
-                            sh '''
-                            ssh $VPS 'bash -s' < ./deploy.sh
-                            '''
-                        }
+                    withCredentials([
+                        string(credentialsId: 'vps-credential', variable: 'VPS'),
+                        string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN'),
+                        string(credentialsId: 'telegram-chat-id', variable: 'TELEGRAM_CHAT_ID')
+                    ]) {
+                        sh '''
+                        ssh $VPS 'bash -s' < ./deploy.sh
+                        '''
                     }
                 }
             }
