@@ -24,7 +24,7 @@ export class HealthController {
   @ApiResponse({ status: 200, description: 'Service is healthy' })
   async check() {
     return this.health.check([
-      () => this.http.pingCheck('local-server', `http://20.17.97.172`),
+      () => this.http.pingCheck('local-server', `http://20.17.97.172:8000`),
 
       // Kiểm tra DB bằng Prism
       // test
