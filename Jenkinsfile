@@ -27,6 +27,7 @@ pipeline {
 
                 // Build dự án
                 sh 'pnpm install'
+                sh 'pnpm prisma generate'
                 sh 'pnpm build'
             }
         }
