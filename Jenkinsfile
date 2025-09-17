@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'tira-be'
+        PATH = "/usr/local/bin:$PATH" // đảm bảo Node/NPM/pnpm nằm trong PATH
     }
 
     stages {
@@ -15,8 +16,18 @@ pipeline {
                     credentialsId: 'github-pat'
                 )
 
-                // Cài pnpm nếu chưa có
+                // Check Node/NPM/pnpm
                 sh '''
+                if ! command -v node > /dev/null; then
+                    echo "Node.js not found! Please install Node.js on agent."
+                    exit 1
+                fi
+
+                if ! command -v npm > /dev/null; then
+                    echo "npm not found! Please install npm on agent."
+                    exit 1
+                fi
+
                 if ! command -v pnpm > /dev/null; then
                     echo "Installing pnpm..."
                     npm install -g pnpm
@@ -39,11 +50,11 @@ pipeline {
                     usernameVariable: 'DOCKERHUB_USER',
                     passwordVariable: 'DOCKERHUB_PASS'
                 )]) {
-                    sh """
-                    echo \$DOCKERHUB_PASS | docker login -u \$DOCKERHUB_USER --password-stdin
-                    docker build -t \$DOCKERHUB_USER/${IMAGE_NAME}:latest .
-                    docker push \$DOCKERHUB_USER/${IMAGE_NAME}:latest
-                    """
+                    sh '''
+                    echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
+                    docker build -t $DOCKERHUB_USER/${IMAGE_NAME}:latest .
+                    docker push $DOCKERHUB_USER/${IMAGE_NAME}:latest
+                    '''
                 }
             }
         }
@@ -51,14 +62,24 @@ pipeline {
         stage('Deploy to VPS') {
             steps {
                 sshagent(['vps-ssh-credential-id']) {
-                    withCredentials([
-                        string(credentialsId: 'vps-credential', variable: 'VPS'),
-                        string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN'),
-                        string(credentialsId: 'telegram-chat-id', variable: 'TELEGRAM_CHAT_ID')
-                    ]) {
-                        sh """
-                        ssh \$VPS 'bash -s' < ./deploy.sh
-                        """
+                    script {
+                        // Check credential tồn tại trước khi deploy
+                        if (!Jenkins.instance.getCredentials().find { it.id == 'telegram-token' }) {
+                            error "Credential 'telegram-token' not found in Jenkins!"
+                        }
+                        if (!Jenkins.instance.getCredentials().find { it.id == 'telegram-chat-id' }) {
+                            error "Credential 'telegram-chat-id' not found in Jenkins!"
+                        }
+
+                        withCredentials([
+                            string(credentialsId: 'vps-credential', variable: 'VPS'),
+                            string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN'),
+                            string(credentialsId: 'telegram-chat-id', variable: 'TELEGRAM_CHAT_ID')
+                        ]) {
+                            sh '''
+                            ssh $VPS 'bash -s' < ./deploy.sh
+                            '''
+                        }
                     }
                 }
             }
@@ -71,11 +92,11 @@ pipeline {
                 string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN'),
                 string(credentialsId: 'telegram-chat-id', variable: 'TELEGRAM_CHAT_ID')
             ]) {
-                sh """
-                curl -s -X POST https://api.telegram.org/bot\$TELEGRAM_TOKEN/sendMessage \
-                -d chat_id=\$TELEGRAM_CHAT_ID \
+                sh '''
+                curl -s -X POST https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage \
+                -d chat_id=$TELEGRAM_CHAT_ID \
                 -d text='✅ CI/CD SUCCESS: Build, Push DockerHub & Deploy to VPS DONE'
-                """
+                '''
             }
         }
 
@@ -84,11 +105,11 @@ pipeline {
                 string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN'),
                 string(credentialsId: 'telegram-chat-id', variable: 'TELEGRAM_CHAT_ID')
             ]) {
-                sh """
-                curl -s -X POST https://api.telegram.org/bot\$TELEGRAM_TOKEN/sendMessage \
-                -d chat_id=\$TELEGRAM_CHAT_ID \
+                sh '''
+                curl -s -X POST https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage \
+                -d chat_id=$TELEGRAM_CHAT_ID \
                 -d text='❌ CI/CD FAILED'
-                """
+                '''
             }
         }
     }
