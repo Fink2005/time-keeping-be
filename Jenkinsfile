@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:24'
-            args '-u root:root' // nếu cần quyền root để cài dependencies
-        }
-    }
+    agent any
 
     environment {
         IMAGE_NAME = 'tira-be'
@@ -24,7 +19,6 @@ pipeline {
         }
 
         stage('Docker Build & Push') {
-            when { expression { currentBuild.currentResult == 'SUCCESS' } }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
                     sh '''
