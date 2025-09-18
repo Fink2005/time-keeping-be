@@ -14,7 +14,19 @@ pipeline {
     stages {
         stage('Checkout & Build NestJS') {
             steps {
-                git branch: 'main', url: 'https://github.com/Fink2005/time-keeping-be.git', credentialsId: 'github-pat'
+                // Clean workspace trước khi checkout
+                deleteDir()
+                
+                // Checkout code
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/Fink2005/time-keeping-be.git',
+                        credentialsId: 'github-pat'
+                    ]]
+                ])
+                
                 sh '''
                     npm ci
                     npx prisma generate
@@ -67,6 +79,12 @@ pipeline {
             ]) {
                 sh "curl -s -X POST https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage -d chat_id=$TELEGRAM_CHAT_ID -d text='❌ CI/CD FAILED'"
             }
+        }
+        always {
+            // Clean up docker images để tiết kiệm dung lượng
+            sh '''
+                docker image prune -f --filter "dangling=true"
+            '''
         }
     }
 }
