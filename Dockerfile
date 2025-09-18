@@ -1,32 +1,26 @@
 # Stage 1: Build
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
 
-
-
-COPY package*.json pnpm-lock.yaml* ./
-RUN npm install -g pnpm
-RUN pnpm install --no-strict-peer-dependencies
+COPY package*.json ./
+RUN npm install
 
 COPY prisma ./prisma
 RUN npx prisma generate
 
 COPY . .
-COPY .env .env
-RUN pnpm build
-
+RUN npm run build
 
 # Stage 2: Production
-FROM node:20-alpine
+FROM node:24-alpine
 WORKDIR /app
 
-COPY package*.json pnpm-lock.yaml* ./
-RUN npm install -g pnpm
-RUN pnpm install --no-strict-peer-dependencies
+COPY package*.json ./
+RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/.env .env
 
 EXPOSE 8000

@@ -1,5 +1,5 @@
+import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import {  Prisma } from '@prisma/client'
 // type Predicate
 export const isUniqueConstraintPrismaError = (
   error: any,

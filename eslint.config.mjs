@@ -43,6 +43,7 @@ export default tseslint.config(
       'style/comma-dangle': 'off',
       'format/prettier': 'off',
       'ts/consistent-type-definitions': 'off',
+      '@typescript-eslint/no-require-imports' : 'off',
     },
   },
 );

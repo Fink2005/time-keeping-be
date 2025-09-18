@@ -16,7 +16,7 @@ pipeline {
                     credentialsId: 'github-pat'
                 )
 
-                // Build dự án với pnpm local (npx)
+                // Build dự án với npm
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh '''
                     # Kiểm tra Node
@@ -31,15 +31,14 @@ pipeline {
                         exit 1
                     fi
 
-                    # Cài pnpm local nếu chưa có trong node_modules
-                    if [ ! -d node_modules/.pnpm ]; then
-                        npm install pnpm --save-dev
-                    fi
+                    # Cài dependencies với npm
+                    npm ci
 
-                    # Dùng npx để chạy pnpm
-                    npx pnpm install
-                    npx pnpm prisma generate
-                    npx pnpm build
+                    # Generate Prisma client
+                    npx prisma generate
+
+                    # Build dự án
+                    npm run build
                     '''
                 }
             }
