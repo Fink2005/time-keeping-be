@@ -39,7 +39,7 @@ services:
     container_name: tira-be
     restart: always
     env_file:
-      - .env
+      - /home/checkingapp/tira/.env  
     ports:
       - '8888:8888'
     depends_on:
