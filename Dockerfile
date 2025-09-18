@@ -2,42 +2,32 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package files và lockfile
-COPY package*.json ./
 
-# Cài pnpm và dependencies, bỏ qua kiểm tra script
+
+COPY package*.json pnpm-lock.yaml* ./
 RUN npm install -g pnpm
-RUN pnpm install --no-strict-peer-dependencies --ignore-scripts
+RUN pnpm install --no-strict-peer-dependencies
 
-# Copy mã nguồn và file .env
-COPY . .
-COPY .env .env
-
-
-
-# Generate Prisma client
+COPY prisma ./prisma
 RUN npx prisma generate
 
-# Build NestJS
+COPY . .
+COPY .env .env
 RUN pnpm build
+
 
 # Stage 2: Production
 FROM node:20-alpine
 WORKDIR /app
 
-# Copy package.json + pnpm-lock.yaml
-COPY package*.json ./
+COPY package*.json pnpm-lock.yaml* ./
 RUN npm install -g pnpm
-RUN pnpm install --production
+RUN pnpm install --no-strict-peer-dependencies
 
-# Copy build, Prisma client, và .env
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/generated ./generated
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/.env .env
 
-# Expose port
 EXPOSE 8000
-
-# Start app
 CMD ["node", "dist/main.js"]

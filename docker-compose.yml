@@ -5,8 +5,10 @@ services:
     image: postgres:16
     container_name: postgres_container
     restart: always
-    env_file:
-      - .env
+    environment:
+      POSTGRES_USER: tira-postgre
+      POSTGRES_PASSWORD: tira-password
+      POSTGRES_DB: tira-db
     ports:
       - '5432:5432'
     volumes:
