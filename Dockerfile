@@ -23,5 +23,5 @@ COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/clie
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/.env .env
 
-EXPOSE 8000
+EXPOSE 8888
 CMD ["node", "dist/main.js"]
