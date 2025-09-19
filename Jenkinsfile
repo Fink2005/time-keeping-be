@@ -75,10 +75,16 @@ pipeline {
                 def BUILD_TIME = sh(script: "date '+%Y-%m-%d %H:%M:%S'", returnStdout: true).trim()
             }
             sh """
-                curl -s -X POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage \
-                -d chat_id=${TG_CHAT} \
-                -d parse_mode=MarkdownV2 \
-                -d text='✅ *CI/CD SUCCESS*\\n━━━━━━━━━━━━\\n👤 *Committer:* \`${GIT_COMMITTER}\`\\n📝 *Message:* \`${GIT_COMMIT_MSG}\`\\n🌿 *Branch:* \`main\`\\n⏰ *Time:* \`${BUILD_TIME}\`\\n━━━━━━━━━━━━'
+                curl -s -X POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage \\
+                -d chat_id=${TG_CHAT} \\
+                -d parse_mode=MarkdownV2 \\
+                -d text='✅ *CI/CD SUCCESS*
+━━━━━━━━━━━━
+👤 *Committer:* \`${GIT_COMMITTER}\`
+📝 *Message:* \`${GIT_COMMIT_MSG}\`
+🌿 *Branch:* \`main\`
+⏰ *Time:* \`${BUILD_TIME}\`
+━━━━━━━━━━━━'
             """
         }
     }
@@ -90,13 +96,21 @@ pipeline {
             }
             sh """
                 LOGS=\$(tail -n 50 \$WORKSPACE/jenkins-log.txt 2>/dev/null | sed 's/[_*[\]\\]/\\\\&/g')
-                curl -s -X POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage \
-                -d chat_id=${TG_CHAT} \
-                -d parse_mode=MarkdownV2 \
-                -d text='❌ *CI/CD FAILED*\\n━━━━━━━━━━━━\\n👤 *Committer:* \`${GIT_COMMITTER}\`\\n📝 *Message:* \`${GIT_COMMIT_MSG}\`\\n🌿 *Branch:* \`main\`\\n⏰ *Time:* \`${BUILD_TIME}\`\\n📄 *Last Logs:* \`\`\`${LOGS}\`\`\`\\n━━━━━━━━━━━━'
+                curl -s -X POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage \\
+                -d chat_id=${TG_CHAT} \\
+                -d parse_mode=MarkdownV2 \\
+                -d text='❌ *CI/CD FAILED*
+━━━━━━━━━━━━
+👤 *Committer:* \`${GIT_COMMITTER}\`
+📝 *Message:* \`${GIT_COMMIT_MSG}\`
+🌿 *Branch:* \`main\`
+⏰ *Time:* \`${BUILD_TIME}\`
+📄 *Last Logs:* \`\`\`${LOGS}\`\`\`
+━━━━━━━━━━━━'
             """
         }
     }
 }
+
 
 }
