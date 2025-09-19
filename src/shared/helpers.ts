@@ -1,4 +1,5 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { randomInt } from 'crypto';
 
 export const isUniqueConstraintPrismaError = (
   error: any,
@@ -11,8 +12,11 @@ export const isUniqueConstraintPrismaError = (
 export const isNotFoundPrismaError = (
   error: any,
 ): error is PrismaClientKnownRequestError => {
-  // <-- sửa ở đây
   return (
     error instanceof PrismaClientKnownRequestError && error.code === 'P2025'
   );
+};
+
+export const generateOTP = (): string => {
+  return String(randomInt(0, 1000000)).padStart(6, '0');
 };
