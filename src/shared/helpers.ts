@@ -1,5 +1,5 @@
-import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+
 export const isUniqueConstraintPrismaError = (
   error: any,
 ): error is PrismaClientKnownRequestError => {
@@ -10,9 +10,9 @@ export const isUniqueConstraintPrismaError = (
 
 export const isNotFoundPrismaError = (
   error: any,
-): error is Prisma.PrismaClientKnownRequestError => {
+): error is PrismaClientKnownRequestError => {
+  // <-- sửa ở đây
   return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === 'P2025'
+    error instanceof PrismaClientKnownRequestError && error.code === 'P2025'
   );
 };
