@@ -35,7 +35,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-return': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
       'no-console': 'warn',
-      'no-unused-vars': 'error',
+      // 'no-unused-vars': 'error',
       'no-lonely-if': 'warn',
       'perfectionist/sort-imports': 'off',
       'no-constant-condition': 'off',
@@ -44,6 +44,8 @@ export default tseslint.config(
       'format/prettier': 'off',
       'ts/consistent-type-definitions': 'off',
       '@typescript-eslint/no-require-imports' : 'off',
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": ["error"],
     },
   },
 );

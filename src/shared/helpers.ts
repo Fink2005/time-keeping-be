@@ -1,9 +1,10 @@
 import { Prisma } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-// type Predicate
+import { randomInt } from 'crypto';
+
+//Kiểu trả về error is Prisma.PrismaClientKnownRequestError là type predicate để error được biết là kiểu Prisma
 export const isUniqueConstraintPrismaError = (
   error: any,
-): error is PrismaClientKnownRequestError => {
+): error is Prisma.PrismaClientKnownRequestError => {
   return (
     error instanceof Prisma.PrismaClientKnownRequestError &&
     error.code === 'P2002'
@@ -12,9 +13,13 @@ export const isUniqueConstraintPrismaError = (
 
 export const isNotFoundPrismaError = (
   error: any,
-): error is PrismaClientKnownRequestError => {
+): error is Prisma.PrismaClientKnownRequestError => {
   return (
     error instanceof Prisma.PrismaClientKnownRequestError &&
     error.code === 'P2025'
   );
+};
+
+export const generateOTP = (): string => {
+  return String(randomInt(0, 1000000)).padStart(6, '0');
 };

@@ -1,18 +1,38 @@
 import { Module } from '@nestjs/common';
-import { APP_PIPE } from '@nestjs/core';
-import { ZodValidationPipe } from 'nestjs-zod';
-import { HealthModule } from 'src/routes/health/health.module';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ZodSerializerInterceptor } from 'nestjs-zod';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './routes/auth/auth.module';
+import { LanguageModule } from './routes/language/language.module';
+import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
+import CustomZodValidationPipe from './shared/pipes/custom-zod-validation.pipe';
+import { SharedModule } from './shared/shared.module';
+// import { CatchEverythingFilter } from './shared/filters/catch-everything.filter'
+
 @Module({
-  imports: [HealthModule],
+  imports: [SharedModule, AuthModule, LanguageModule],
   controllers: [AppController],
   providers: [
     AppService,
     {
+      //NestJS sẽ áp dụng ZodValidationPipe cho mọi DTO.
+      //DTO nào extends từ createZodDto (ví dụ RegisterBodyDTO) sẽ được validate tự động theo schema bạn truyền vào.
       provide: APP_PIPE,
-      useClass: ZodValidationPipe,
+      useValue: CustomZodValidationPipe,
     },
+    {
+      provide: APP_INTERCEPTOR, // Tất cả controllers đều phải chạy qua ClassSerializerInterceptor, để validate data trước khi response
+      useClass: ZodSerializerInterceptor,
+    },
+    {
+      provide: APP_FILTER, //bắt và xử lý mọi exception trên toàn ứng dụng, không cần khai báo lại từng chỗ.
+      useClass: HttpExceptionFilter,
+    },
+    // {
+    //   provide: APP_FILTER,//bắt và xử lý mọi exception trên toàn ứng dụng, lỗi chung chung
+    //   useClass: CatchEverythingFilter
+    // }
   ],
 })
 export class AppModule {}

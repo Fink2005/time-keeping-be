@@ -1,7 +1,10 @@
 {
-  "exclude": ["commitlint.config.cjs"],
+  "exclude": [
+    "commitlint.config.cjs"
+  ],
   "compilerOptions": {
     "module": "commonjs",
+    "jsx": "react-jsx",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -19,5 +22,10 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
+  },
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ] // check đường dẫn chặt chẽ hơn
   }
 }

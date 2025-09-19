@@ -1,39 +1,46 @@
-/* eslint-disable no-console */
-import dotenv from 'dotenv';
+import { config } from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-import { object, string } from 'zod';
+import { z } from 'zod';
 
-const envPath = path.resolve('.env');
-
-// Only load .env if it exists (for local dev)
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-} else {
-  console.warn(
-    '.env file not found — assuming environment variables are set externally (e.g. on Render)',
-  );
-}
-
-// Zod schema
-const ConfigSchema = object({
-  DATABASE_URL: string().nonempty(),
-  ACCESS_TOKEN_SECRET: string().nonempty(),
-  ACCESS_TOKEN_EXPIRES_IN: string().nonempty(),
-  PORT: string().nonempty(),
-  SECRET_API_KEY: string().nonempty(),
-  REFRESH_TOKEN_SECRET: string().nonempty(),
-  REFRESH_TOKEN_EXPIRES_IN: string().nonempty(),
+config({
+  path: '.env',
 });
 
-// Validate
-const result = ConfigSchema.safeParse(process.env);
+// Kiem tra .env
+if (!fs.existsSync(path.resolve('.env'))) {
+  console.log('Khong thay .env');
+  process.exit(1);
+}
+const conifgSchema = z.object({
+  DATABASE_URL: z.string(),
+  ACCESS_TOKEN_SECRET: z.string(),
+  ACCESS_TOKEN_EXPIRES_IN: z.string(),
+  REFRESH_TOKEN_SECRET: z.string(),
+  REFRESH_TOKEN_EXPIRES_IN: z.string(),
+  SECERET_API_KEY: z.string(),
 
-if (!result.success) {
-  console.error('❌ Invalid environment variables:\n');
-  console.error(result.error.format());
+  PORT: z.string(),
+  AUTH_SERVICE_URL: z.string(),
+  AUTH_SERVICE_KEY: z.string(),
+
+  OTP_EXPIRES_IN: z.string(),
+  RESEND_API_KEY: z.string(),
+
+  GOOGLE_CLIENT_ID: z.string(),
+  GOOGLE_CLIENT_SECERET: z.string(),
+  GOOGLE_REDIRECT_URI: z.string(),
+  GOOGLE_CLIENT_REDIRECT_URI: z.string(),
+  APP_NAME: z.string(),
+});
+
+const configServer = conifgSchema.safeParse(process.env);
+
+if (!configServer.success) {
+  console.log('Cac gia tri trong .env khong hop le');
+  console.error(configServer.error);
   process.exit(1);
 }
 
-const envConfig = result.data;
+const envConfig = configServer.data;
 export default envConfig;

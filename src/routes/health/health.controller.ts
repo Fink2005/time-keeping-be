@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 // src/health/health.controller.ts
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
