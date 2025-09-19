@@ -16,12 +16,8 @@ COPY package*.json ./
 RUN npm install --omit=dev
 
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-
-# Chỉ copy prisma folder, không generate
-COPY prisma ./prisma
+COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 EXPOSE 8888
-
-# Generate client runtime trước khi start app
-CMD ["sh", "-c", "npx prisma generate && node dist/main.js"]
+CMD ["node", "dist/main.js"]
