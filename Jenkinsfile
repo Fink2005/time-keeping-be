@@ -1,32 +1,24 @@
 pipeline {
-    agent {
-        docker {
-            image 'my-node-docker:latest'
-            args '-v /var/run/docker.sock:/var/run/docker.sock -u root:root'
-        }
-    }
+    agent any
 
     environment {
         IMAGE_NAME = 'tira-be'
-        PATH = "/usr/bin:/usr/local/bin:$PATH"
+        PATH       = "/usr/bin:/usr/local/bin:$PATH"
+        VPS        = 'checkingapp@20.17.97.172' // hoặc credential text nếu muốn bảo mật
     }
 
     stages {
         stage('Checkout & Build NestJS') {
             steps {
-                // Clean workspace trước khi checkout
                 deleteDir()
-                
-                // Checkout code
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/Fink2005/time-keeping-be.git',
-                        credentialsId: 'github-pat'
-                    ]]
-                ])
-                
+                // Dùng git username/password credential
+                withCredentials([usernamePassword(credentialsId: 'git-credentials', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    git(
+                        branch: 'main',
+                        url: "https://${GIT_USER}:${GIT_PASS}@github.com/Fink2005/time-keeping-be.git"
+                    )
+                }
+
                 sh '''
                     npm ci
                     npx prisma generate
@@ -38,11 +30,11 @@ pipeline {
         stage('Docker Build & Push') {
             when { expression { currentBuild.currentResult == 'SUCCESS' } }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'docker-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh '''
-                        echo $DOCKERHUB_PASS | docker login -u $DOCKERHUB_USER --password-stdin
-                        docker build -t $DOCKERHUB_USER/${IMAGE_NAME}:latest .
-                        docker push $DOCKERHUB_USER/${IMAGE_NAME}:latest
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker build -t $DOCKER_USER/${IMAGE_NAME}:latest .
+                        docker push $DOCKER_USER/${IMAGE_NAME}:latest
                     '''
                 }
             }
@@ -50,14 +42,10 @@ pipeline {
 
         stage('Deploy to VPS') {
             steps {
-                sshagent(['vps-ssh-credential-id']) {
-                    withCredentials([
-                        string(credentialsId: 'vps-credential', variable: 'VPS'),
-                        string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN'),
-                        string(credentialsId: 'telegram-chat-id', variable: 'TELEGRAM_CHAT_ID')
-                    ]) {
-                        sh "ssh $VPS 'bash -s' < ./deploy.sh"
-                    }
+                sshagent(credentials: ['vps-key']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no $VPS "bash /home/checkingapp/deploy.sh"
+                    '''
                 }
             }
         }
@@ -65,26 +53,19 @@ pipeline {
 
     post {
         success {
-            withCredentials([
-                string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN'),
-                string(credentialsId: 'telegram-chat-id', variable: 'TELEGRAM_CHAT_ID')
-            ]) {
-                sh "curl -s -X POST https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage -d chat_id=$TELEGRAM_CHAT_ID -d text='✅ CI/CD SUCCESS'"
+            withCredentials([string(credentialsId: 'telegram-token', variable: 'TG_TOKEN'),
+                             string(credentialsId: 'telegram-chat-id', variable: 'TG_CHAT')]) {
+                sh "curl -s -X POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage -d chat_id=${TG_CHAT} -d text='✅ CI/CD SUCCESS'"
             }
         }
         failure {
-            withCredentials([
-                string(credentialsId: 'telegram-token', variable: 'TELEGRAM_TOKEN'),
-                string(credentialsId: 'telegram-chat-id', variable: 'TELEGRAM_CHAT_ID')
-            ]) {
-                sh "curl -s -X POST https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage -d chat_id=$TELEGRAM_CHAT_ID -d text='❌ CI/CD FAILED'"
+            withCredentials([string(credentialsId: 'telegram-token', variable: 'TG_TOKEN'),
+                             string(credentialsId: 'telegram-chat-id', variable: 'TG_CHAT')]) {
+                sh "curl -s -X POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage -d chat_id=${TG_CHAT} -d text='❌ CI/CD FAILED'"
             }
         }
         always {
-            // Clean up docker images để tiết kiệm dung lượng
-            sh '''
-                docker image prune -f --filter "dangling=true"
-            '''
+            sh 'docker image prune -f --filter "dangling=true"'
         }
     }
 }
