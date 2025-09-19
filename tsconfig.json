@@ -8,6 +8,9 @@
   "compilerOptions": {
     "module": "commonjs",
     "jsx": "react-jsx",
+    "types": [
+      "react"
+    ],
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
