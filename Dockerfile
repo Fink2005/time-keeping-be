@@ -5,10 +5,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-COPY prisma ./prisma
+COPY . .
+
+# Generate Prisma client trước khi build
 RUN npx prisma generate
 
-COPY . .
 RUN npm run build
 
 # Stage 2: Production
@@ -18,6 +19,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev
 
+# Copy build + Prisma client
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma

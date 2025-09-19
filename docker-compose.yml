@@ -36,7 +36,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: tira-be
+    container_name: tira-container
     restart: always
     env_file:
       - /home/checkingapp/tira/.env  
