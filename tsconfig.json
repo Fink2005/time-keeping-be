@@ -1,5 +1,5 @@
 {
-  "exclude": ["commitlint.config.cjs"],
+"exclude": ["commitlint.config.cjs", "dist", "node_modules", "test"],
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
@@ -16,7 +16,7 @@
     "skipLibCheck": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
   }

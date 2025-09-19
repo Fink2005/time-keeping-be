@@ -1,11 +1,10 @@
 import { Prisma } from '@prisma/client';
-// type Predicate
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 export const isUniqueConstraintPrismaError = (
   error: any,
-): error is Prisma.PrismaClientKnownRequestError => {
+): error is PrismaClientKnownRequestError => {
   return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === 'P2002'
+    error instanceof PrismaClientKnownRequestError && error.code === 'P2002'
   );
 };
 
