@@ -67,50 +67,48 @@ pipeline {
         }
     }
 
-   post {
+post {
     success {
         withCredentials([string(credentialsId: 'telegram-token', variable: 'TG_TOKEN'),
                          string(credentialsId: 'telegram-chat-id', variable: 'TG_CHAT')]) {
-            script {
-                def BUILD_TIME = sh(script: "date '+%Y-%m-%d %H:%M:%S'", returnStdout: true).trim()
-            }
             sh """
-                curl -s -X POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage \\
-                -d chat_id=${TG_CHAT} \\
-                -d parse_mode=MarkdownV2 \\
-                -d text='✅ *CI/CD SUCCESS*
+                BUILD_TIME=\$(date '+%Y-%m-%d %H:%M:%S')
+                curl -s -X POST https://api.telegram.org/bot\${TG_TOKEN}/sendMessage \\
+                    -d chat_id=\${TG_CHAT} \\
+                    -d parse_mode=MarkdownV2 \\
+                    -d text="✅ *CI/CD SUCCESS*
 ━━━━━━━━━━━━
-👤 *Committer:* \`${GIT_COMMITTER}\`
-📝 *Message:* \`${GIT_COMMIT_MSG}\`
-🌿 *Branch:* \`main\`
-⏰ *Time:* \`${BUILD_TIME}\`
-━━━━━━━━━━━━'
+👤 *Committer:* \${GIT_COMMITTER}
+📝 *Message:* \${GIT_COMMIT_MSG}
+🌿 *Branch:* main
+⏰ *Time:* \${BUILD_TIME}
+━━━━━━━━━━━━"
             """
         }
     }
+
     failure {
         withCredentials([string(credentialsId: 'telegram-token', variable: 'TG_TOKEN'),
                          string(credentialsId: 'telegram-chat-id', variable: 'TG_CHAT')]) {
-            script {
-                def BUILD_TIME = sh(script: "date '+%Y-%m-%d %H:%M:%S'", returnStdout: true).trim()
-            }
             sh """
+                BUILD_TIME=\$(date '+%Y-%m-%d %H:%M:%S')
                 LOGS=\$(tail -n 50 \$WORKSPACE/jenkins-log.txt 2>/dev/null | sed 's/[_*[\]\\]/\\\\&/g')
-                curl -s -X POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage \\
-                -d chat_id=${TG_CHAT} \\
-                -d parse_mode=MarkdownV2 \\
-                -d text='❌ *CI/CD FAILED*
+                curl -s -X POST https://api.telegram.org/bot\${TG_TOKEN}/sendMessage \\
+                    -d chat_id=\${TG_CHAT} \\
+                    -d parse_mode=MarkdownV2 \\
+                    -d text="❌ *CI/CD FAILED*
 ━━━━━━━━━━━━
-👤 *Committer:* \`${GIT_COMMITTER}\`
-📝 *Message:* \`${GIT_COMMIT_MSG}\`
-🌿 *Branch:* \`main\`
-⏰ *Time:* \`${BUILD_TIME}\`
-📄 *Last Logs:* \`\`\`${LOGS}\`\`\`
-━━━━━━━━━━━━'
+👤 *Committer:* \${GIT_COMMITTER}
+📝 *Message:* \${GIT_COMMIT_MSG}
+🌿 *Branch:* main
+⏰ *Time:* \${BUILD_TIME}
+📄 *Last Logs:* \`\`\`\${LOGS}\`\`\`
+━━━━━━━━━━━━"
             """
         }
     }
 }
+
 
 
 }
