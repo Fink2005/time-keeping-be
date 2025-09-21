@@ -1,16 +1,18 @@
-import { config } from 'dotenv';
+import { config as dotenvConfig } from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { z } from 'zod';
 
-config({
-  path: '.env',
-});
+// 🚀 Chỉ load file .env khi không phải production
+if (process.env.NODE_ENV !== 'production') {
+  const envPath = path.resolve('.env');
 
-// Kiem tra .env
-if (!fs.existsSync(path.resolve('.env'))) {
-  console.log('Khong thay .env');
-  process.exit(1);
+  if (!fs.existsSync(envPath)) {
+    console.error('❌ Không tìm thấy file .env');
+    process.exit(1);
+  }
+
+  dotenvConfig({ path: envPath });
 }
 const conifgSchema = z.object({
   DATABASE_URL: z.string(),
