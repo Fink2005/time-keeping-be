@@ -1,37 +1,30 @@
-import { PrismaService } from 'src/shared/services/prisma.service';
 import { Injectable } from '@nestjs/common';
+import { TypeOfVerificationCodeType } from 'src/shared/constants/auth.constant';
+import { UserType } from 'src/shared/models/shared-user.model';
+import { PrismaService } from 'src/shared/services/prisma.service';
 import {
   DeviceType,
   RefreshTokenType,
   VerificationCodeType,
 } from './auth.model';
-import { UserType } from 'src/shared/models/shared-user.model';
-import { TypeOfVerificationCodeType } from 'src/shared/constants/auth.constant';
 
 @Injectable()
 export class AuthRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createUser(
-    user: Pick<
-      UserType,
-      'email' | 'name' | 'password' | 'phoneNumber' | 'avatar'
-    >,
-  ): Promise<Omit<UserType, 'password' | 'totpSecret'>> {
+    user: Pick<UserType, 'email'>,
+  ): Promise<Omit<UserType, 'totpSecret'>> {
     return this.prismaService.user.create({
       data: user,
       omit: {
-        password: true,
         totpSecret: true,
       },
     });
   }
 
   async createUserGoogle(
-    user: Pick<
-      UserType,
-      'email' | 'name' | 'password' | 'phoneNumber' | 'avatar'
-    >,
+    user: Pick<UserType, 'email' | 'name' | 'phoneNumber' | 'avatar'>,
   ): Promise<UserType> {
     return this.prismaService.user.create({
       data: user,

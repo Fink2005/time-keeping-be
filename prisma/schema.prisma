@@ -27,14 +27,12 @@ model Language {
 model User {
   id          Int     @id @default(autoincrement())
   email       String  @unique
-  name        String  @db.VarChar(500)
-  password    String  @db.VarChar(500)
-  phoneNumber String  @db.VarChar(50)
+  name        String? @db.VarChar(500)
+  phoneNumber String? @db.VarChar(50)
   avatar      String? @db.VarChar(1000) //scalar type
   //chỉ có scalar type thì mới là collumm của table, còn 
 
   // Này có thể dùng để thực hiện chức năng quên mật khẩu, đăng nhập 2 bước
-  totpSecret    String?        @unique @db.VarChar(1000)
   status        UserStatus     @default(INACTIVE)
   refreshTokens RefreshToken[]
 

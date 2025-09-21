@@ -19,7 +19,7 @@ import { SharedModule } from './shared/shared.module';
       //NestJS sẽ áp dụng ZodValidationPipe cho mọi DTO.
       //DTO nào extends từ createZodDto (ví dụ RegisterBodyDTO) sẽ được validate tự động theo schema bạn truyền vào.
       provide: APP_PIPE,
-      useValue: CustomZodValidationPipe,
+      useClass: CustomZodValidationPipe,
     },
     {
       provide: APP_INTERCEPTOR, // Tất cả controllers đều phải chạy qua ClassSerializerInterceptor, để validate data trước khi response
