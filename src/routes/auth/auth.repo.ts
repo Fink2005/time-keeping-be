@@ -12,14 +12,9 @@ import {
 export class AuthRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createUser(
-    user: Pick<UserType, 'email'>,
-  ): Promise<Omit<UserType, 'totpSecret'>> {
+  async createUser(user: Pick<UserType, 'email'>): Promise<UserType> {
     return this.prismaService.user.create({
       data: user,
-      omit: {
-        totpSecret: true,
-      },
     });
   }
 
