@@ -1,7 +1,9 @@
 import {
+  HttpException,
   UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
+import { AxiosError } from '@nestjs/terminus/dist/errors/axios.error';
 
 // OTP related errors
 export const InvalidOTPException = new UnprocessableEntityException([
@@ -91,3 +93,12 @@ export const InvalidTOTPException = new UnprocessableEntityException([
     path: 'code',
   },
 ]);
+
+export const ApiAcountCenterException = (err: AxiosError) => {
+  return new HttpException(
+    (err.response?.data as Record<string, any>) ?? {
+      message: 'Unexpected error',
+    },
+    (err.response?.status as number) ?? 500,
+  );
+};

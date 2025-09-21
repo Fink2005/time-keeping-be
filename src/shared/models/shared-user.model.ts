@@ -4,10 +4,9 @@ import { UserStatus } from '../constants/auth.constant';
 export const UserSchema = z.object({
   id: z.number(),
   email: z.string().email(),
-  password: z.string().min(2).max(100),
 
-  name: z.string().min(1).max(20),
-  phoneNumber: z.string().min(10).max(15),
+  name: z.string().min(1).max(20).nullable(),
+  phoneNumber: z.string().min(10).max(15).nullable(),
   avatar: z.string().nullable(),
   totpSecret: z.string().nullable(),
   status: z.nativeEnum(UserStatus),

@@ -21,9 +21,8 @@ CREATE TABLE "public"."Language" (
 CREATE TABLE "public"."User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
-    "name" VARCHAR(500) NOT NULL,
-    "password" VARCHAR(500) NOT NULL,
-    "phoneNumber" VARCHAR(50) NOT NULL,
+    "name" VARCHAR(500),
+    "phoneNumber" VARCHAR(50),
     "avatar" VARCHAR(1000),
     "totpSecret" VARCHAR(1000),
     "status" "public"."UserStatus" NOT NULL DEFAULT 'INACTIVE',
