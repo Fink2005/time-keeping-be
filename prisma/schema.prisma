@@ -21,7 +21,42 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
+  attendances Attendance[] @relation("UserAttendance") // 1 user có nhiều bản ghi chấm công
+  locations   Location[]   @relation("UserLocation") // 1 user có thể tạo nhiều địa điểm riêng
+
   @@index([deletedAt])
+}
+
+model Location {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255) // VD: Công ty A, Cửa hàng B
+  lat       Decimal  @db.Decimal(9, 6)
+  lng       Decimal  @db.Decimal(9, 6)
+  address   String?  @db.VarChar(500)
+  radius    Int      @default(50) // bán kính check-in cho phép
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId Int
+  user   User @relation("UserLocation", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  attendances Attendance[] @relation("LocationAttendance") // các chấm công tại địa điểm này 
+}
+
+model Attendance {
+  id        Int              @id @default(autoincrement())
+  lat       Decimal          @db.Decimal(9, 6)
+  lng       Decimal          @db.Decimal(9, 6)
+  address   String           @db.VarChar(500)
+  radius    Int
+  createdAt DateTime         @default(now())
+  type      AttendanceStatus
+  imageUri  String?
+  userId    Int
+  user      User             @relation("UserAttendance", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  Location   Location? @relation("LocationAttendance", fields: [locationId], references: [id], onDelete: SetNull)
+  locationId Int?
 }
 
 model VerificationCode {
@@ -48,4 +83,9 @@ enum UserStatus {
   ACTIVE
   INACTIVE
   BLOCKED
+}
+
+enum AttendanceStatus {
+  CHECK_IN
+  CHECK_OUT
 }
