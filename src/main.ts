@@ -25,7 +25,9 @@ async function bootstrap() {
       },
       'JWT-auth',
     )
+    // Thêm nhiều server để chọn
     .addServer(`http://localhost:${envConfig.PORT}`, 'Local development server')
+    .addServer('https://api.tira.click', 'Production API')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -45,7 +47,6 @@ async function bootstrap() {
     origin: [
       `http://localhost:${envConfig.PORT}`,
       'http://localhost:3000',
-      'http://20.17.97.172:5432',
       'https://api.tira.click/',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
