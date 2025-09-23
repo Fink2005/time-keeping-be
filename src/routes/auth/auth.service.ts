@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { AxiosError } from '@nestjs/terminus/dist/errors/axios.error';
 import { isAxiosError } from 'axios';
 import { addMilliseconds } from 'date-fns';
@@ -10,20 +10,27 @@ import {
   FailedToSendOTPException,
   InvalidOTPException,
   OTPExpiredException,
+  RefreshTokenAlreadyUsedException,
+  UnauthorizedAccessException,
 } from 'src/routes/auth/auth.error';
 import envConfig from 'src/shared/config';
 import {
   TypeOfVerificationCode,
   TypeOfVerificationCodeType,
 } from 'src/shared/constants/auth.constant';
-import { generateOTP } from 'src/shared/helpers';
+import { generateOTP, isNotFoundPrismaError } from 'src/shared/helpers';
 import { SharedUserRepository } from 'src/shared/repositories/shared-user.repo';
 import { AuthApisService } from 'src/shared/services/apis.service';
 import { EmailService } from 'src/shared/services/email.service';
 import { HashingService } from 'src/shared/services/hashing.service';
 import { TokenService } from 'src/shared/services/token.service';
 import { AccessTokenPayloadCreate } from 'src/shared/types/jwt.type';
-import { LoginBodyType, RegisterBodyType, SendOTPBodyType } from './auth.model';
+import {
+  LoginBodyType,
+  RefreshTokenBodyType,
+  RegisterBodyType,
+  SendOTPBodyType,
+} from './auth.model';
 import { AuthRepository } from './auth.repo';
 
 @Injectable()
@@ -158,69 +165,55 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  // async refreshToken({
-  //   refreshToken,
-  //   userAgent,
-  //   ip,
-  // }: RefreshTokenBodyType & { userAgent: string; ip: string }) {
-  //   try {
-  //     //Kiểm tra token hợp lệ
-  //     const { userId } =
-  //       await this.tokenService.verifyRefreshToken(refreshToken);
+  async refreshToken({ refreshToken }: RefreshTokenBodyType) {
+    try {
+      //Kiểm tra token hợp lệ
+      const { userId } =
+        await this.tokenService.verifyRefreshToken(refreshToken);
 
-  //     const refreshTokenInDB = await this.authRepository.findUniqueRefreshToken(
-  //       { token: refreshToken },
-  //     );
+      const refreshTokenInDb = await this.authRepository.findUniqueRefreshToken(
+        { refreshToken },
+      );
+      if (!refreshTokenInDb) throw RefreshTokenAlreadyUsedException;
+      //Tạo AT và RT mới và cập nhật
+      const tokens = await this.generateTokens({
+        userId,
+      });
 
-  //     if (!refreshTokenInDB) {
-  //       throw RefreshTokenAlreadyUsedException;
-  //     }
-  //     const { deviceId } = refreshTokenInDB;
-  //     //Cập nhật device
-  //     const $updateDevice = this.authRepository.updateDevice(deviceId, {
-  //       ip,
-  //       userAgent,
-  //     });
+      await this.authRepository.updateUser(
+        { id: userId },
+        {
+          refreshToken: tokens.refreshToken,
+        },
+      );
+      return tokens;
+    } catch (error) {
+      // mặc định throw UnauthorizedException là instaneOf HttpException
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw UnauthorizedAccessException;
+    }
+  }
 
-  //     //Xóa RT cũ
-  //     const $deleteRefreshToken = this.authRepository.deleteRefreshToken({
-  //       token: refreshToken,
-  //     });
+  async logout(refreshToken: string) {
+    try {
+      const { userId } =
+        await this.tokenService.verifyRefreshToken(refreshToken);
 
-  //     //Tạo AT và RT mới và cập nhật
-  //     const $token = this.generateTokens({ userId, deviceId });
+      await this.authRepository.updateUser(
+        { id: userId },
+        {
+          refreshToken: null,
+        },
+      );
+      return { message: 'Logout successfully' };
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) throw RefreshTokenAlreadyUsedException;
 
-  //     const [, , tokens] = await Promise.all([
-  //       $updateDevice,
-  //       $deleteRefreshToken,
-  //       $token,
-  //     ]);
-  //     return tokens;
-  //   } catch (error) {
-  //     // mặc định throw UnauthorizedException là instaneOf HttpException
-  //     if (error instanceof HttpException) {
-  //       throw error;
-  //     }
-  //     throw UnauthorizedAccessException;
-  //   }
-  // }
-
-  // async logout(refreshToken: string) {
-  //   try {
-  //     await this.tokenService.verifyRefreshToken(refreshToken);
-  //     const deletedRefreshToken = await this.authRepository.deleteRefreshToken({
-  //       token: refreshToken,
-  //     });
-  //     await this.authRepository.updateDevice(deletedRefreshToken.deviceId, {
-  //       isActive: false,
-  //     });
-  //     return { message: 'Logout successfully' };
-  //   } catch (error) {
-  //     if (isNotFoundPrismaError(error)) throw RefreshTokenAlreadyUsedException;
-
-  //     throw UnauthorizedAccessException;
-  //   }
-  // }
+      throw UnauthorizedAccessException;
+    }
+  }
 
   // async forgotPassword(body: ForgotPasswordBodyType) {
   //   const { email, newPassword } = body;
@@ -258,69 +251,6 @@ export class AuthService {
   //   ]);
   //   return {
   //     message: 'Password changed successfully',
-  //   };
-  // }
-
-  // async setupTwoFactorAuth(userId: number) {
-  //   // Lấy thông tin user ( đã tồn tại & bật 2FA chưa)
-  //   const user = await this.sharedUserRepository.findUnique({
-  //     id: userId,
-  //   });
-  //   if (!user) {
-  //     throw EmailNotFoundException;
-  //   }
-
-  //   if (user.totpSecret) {
-  //     throw TOTPAlreadyEnableException;
-  //   }
-
-  //   // Tạo secret và uri
-  //   const { secret, uri } = this.twoFactorService.generateTOTPSecrete(
-  //     user.email,
-  //   );
-
-  //   // Cập nhật secret vào user
-  //   await this.authRepository.updateUser(
-  //     {
-  //       id: userId,
-  //     },
-  //     { totpSecret: secret },
-  //   );
-
-  //   // Trả về
-  //   return { secret, uri };
-  // }
-
-  // async disableTwoFactorAuth(
-  //   data: DisableTwoFactorBodyType & { userId: number },
-  // ) {
-  //   const { userId, totpCode, code } = data;
-  //   const user = await this.sharedUserRepository.findUnique({
-  //     id: userId,
-  //   });
-  //   if (!user) throw EmailNotFoundException;
-  //   if (!user.totpSecret) throw TOTPNotEnableException;
-
-  //   // Kiểm tra totp hợp lệ không
-  //   if (totpCode) {
-  //     const isValid = this.twoFactorService.verifyTOTP({
-  //       email: user.email,
-  //       secret: user.totpSecret,
-  //       token: totpCode,
-  //     });
-  //     if (!isValid) throw InvalidTOTPException;
-  //   } else if (code) {
-  //     await this.validateVerificationCode({
-  //       email: user.email,
-  //       code,
-  //       type: TypeOfVerificationCode.DISABLE_2FA,
-  //     });
-  //   }
-
-  //   //Cập nhật secret thành null
-  //   await this.authRepository.updateUser({ id: userId }, { totpSecret: null });
-  //   return {
-  //     message: 'Turn off 2FA successfully',
   //   };
   // }
 }

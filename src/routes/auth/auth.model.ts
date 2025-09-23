@@ -75,11 +75,16 @@ export const LoginResSchema = UserSchema.pick({
   accessToken: z.string(),
 });
 
+export const RefreshTokenResSchema = LoginResSchema;
+export const RefreshTokenBodySchema = z.object({
+  refreshToken: z.string(),
+});
+
 export type RegisterBodyType = z.infer<typeof RegisterBodySchema>;
 export type RegisterResType = z.infer<typeof RegisterResSchema>;
 export type VerificationCodeType = z.infer<typeof VerificationCodeSchema>;
 export type SendOTPBodyType = z.infer<typeof SendOTPBodySchema>;
 export type LoginBodyType = z.infer<typeof LoginBodySchema>;
 export type LoginResType = z.infer<typeof LoginResSchema>;
-
+export type RefreshTokenBodyType = z.infer<typeof RefreshTokenBodySchema>;
 export type RefreshTokenResType = LoginResType;

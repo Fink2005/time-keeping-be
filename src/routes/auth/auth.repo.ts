@@ -75,4 +75,12 @@ export class AuthRepository {
   ): Promise<VerificationCodeType> {
     return this.prismaService.verificationCode.delete({ where: uniqueObject });
   }
+
+  findUniqueRefreshToken(uniqueObject: {
+    refreshToken: string;
+  }): Promise<UserType> {
+    return this.prismaService.user.findFirstOrThrow({
+      where: uniqueObject,
+    });
+  }
 }
