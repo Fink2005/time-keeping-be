@@ -42,7 +42,11 @@ async function bootstrap() {
 
   // CORS
   app.enableCors({
-    origin: [`http://localhost:${envConfig.PORT}`, 'http://localhost:3000'],
+    origin: [
+      `http://localhost:${envConfig.PORT}`,
+      'http://localhost:3000',
+      'http://20.17.97.172:5432',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
