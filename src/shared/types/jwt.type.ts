@@ -1,6 +1,5 @@
 export interface AccessTokenPayloadCreate {
   userId: number;
-  deviceId: number;
 }
 
 export interface AccessTokenPayload extends AccessTokenPayloadCreate {

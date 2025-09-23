@@ -5,7 +5,6 @@ import { AccessTokenGuard } from './guards/access-token.guard';
 import { APIKeyGuard } from './guards/api-key.guard';
 import { AuthenticationGuard } from './guards/authentication.guard';
 import { SharedUserRepository } from './repositories/shared-user.repo';
-import { TwoFactorService } from './services/2fa.service';
 import { AuthApisService } from './services/apis.service';
 import { EmailService } from './services/email.service';
 import { HashingService } from './services/hashing.service';
@@ -18,7 +17,6 @@ const sharedServices = [
   TokenService,
   SharedUserRepository,
   EmailService,
-  TwoFactorService,
   AuthApisService,
 ];
 

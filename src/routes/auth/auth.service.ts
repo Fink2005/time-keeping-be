@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AxiosError } from '@nestjs/terminus/dist/errors/axios.error';
+import { isAxiosError } from 'axios';
 import { addMilliseconds } from 'date-fns';
 import ms, { StringValue } from 'ms';
-
 import {
   ApiAcountCenterException,
   EmailAlreadyExistsException,
@@ -18,7 +18,6 @@ import {
 } from 'src/shared/constants/auth.constant';
 import { generateOTP } from 'src/shared/helpers';
 import { SharedUserRepository } from 'src/shared/repositories/shared-user.repo';
-import { TwoFactorService } from 'src/shared/services/2fa.service';
 import { AuthApisService } from 'src/shared/services/apis.service';
 import { EmailService } from 'src/shared/services/email.service';
 import { HashingService } from 'src/shared/services/hashing.service';
@@ -35,7 +34,6 @@ export class AuthService {
     private readonly sharedUserRepository: SharedUserRepository,
     private readonly emailService: EmailService,
     private readonly tokenService: TokenService,
-    private readonly twoFactorService: TwoFactorService,
     private readonly authApisService: AuthApisService,
   ) {}
 
@@ -67,8 +65,10 @@ export class AuthService {
   async register(body: RegisterBodyType) {
     try {
       const resUrl = `/auth/register`;
+      //Tạo user bên account center
       const result = await this.authApisService.register({ resUrl, body });
 
+      //Decode lấy email || email trên bod
       if (result?.data?.data?.email) {
         await this.authRepository.createUser({
           email: result.data.data.email,
@@ -79,8 +79,8 @@ export class AuthService {
         email: result?.data.data.email,
       };
     } catch (error) {
-      const err = error as AxiosError;
-      if (err.response) throw ApiAcountCenterException(err);
+      if (isAxiosError(error))
+        throw ApiAcountCenterException(error as AxiosError);
       throw error;
     }
   }
@@ -116,9 +116,10 @@ export class AuthService {
     return { message: 'Send OTP Successfully' };
   }
 
-  async login(body: LoginBodyType & { userAgent: string; ip: string }) {
+  async login(body: LoginBodyType) {
     try {
       const resUrl = `/auth/login`;
+
       const user = await this.sharedUserRepository.findUnique({
         email: body.email,
       });
@@ -127,39 +128,33 @@ export class AuthService {
         throw EmailNotFoundException;
       }
 
+      // Nếu lỗi sẽ throw error bên account center
       await this.authApisService.login({ resUrl, body });
-      // Tạo device
-      const device = await this.authRepository.createDevice({
-        userId: user.id,
-        ip: body.ip,
-        userAgent: body.userAgent,
-      });
+
       const tokens = await this.generateTokens({
         userId: user.id,
-        deviceId: device.id,
       });
+
+      await this.authRepository.updateUser(
+        { id: user.id },
+        {
+          refreshToken: tokens.refreshToken,
+        },
+      );
       return tokens;
     } catch (error) {
-      const err = error as AxiosError;
-      if (err.response) throw ApiAcountCenterException(err);
+      if (isAxiosError(error))
+        throw ApiAcountCenterException(error as AxiosError);
       throw error;
     }
   }
 
-  async generateTokens({ userId, deviceId }: AccessTokenPayloadCreate) {
+  async generateTokens({ userId }: AccessTokenPayloadCreate) {
     const [accessToken, refreshToken] = await Promise.all([
-      this.tokenService.signAccessToken({ userId, deviceId }),
+      this.tokenService.signAccessToken({ userId }),
       this.tokenService.signRefreshToken({ userId }),
     ]);
 
-    const decodeRefreshToken =
-      await this.tokenService.verifyRefreshToken(refreshToken);
-    await this.authRepository.createRefreshToken({
-      token: refreshToken,
-      userId,
-      expiresAt: new Date(decodeRefreshToken.exp * 1000),
-      deviceId,
-    });
     return { accessToken, refreshToken };
   }
 

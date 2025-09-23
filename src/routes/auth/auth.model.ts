@@ -69,91 +69,10 @@ export const LoginBodySchema = UserSchema.pick({
     }
   });
 
-export const LoginResSchema = z.object({
+export const LoginResSchema = UserSchema.pick({
+  refreshToken: true,
+}).extend({
   accessToken: z.string(),
-  refreshToken: z.string(),
-});
-
-export const RefreshTokenBodySchema = z
-  .object({
-    refreshToken: z.string(),
-  })
-  .strict();
-
-export const RefreshTokenResSchema = LoginResSchema;
-
-export const DeviceSchema = z.object({
-  id: z.number(),
-  userId: z.number(),
-  userAgent: z.string(),
-  ip: z.string(),
-  lastActive: z.date(),
-  createdAt: z.date(),
-  isActive: z.boolean(),
-});
-
-export const RefreshTokenSchema = z.object({
-  token: z.string(),
-  userId: z.number(),
-  deviceId: z.number(),
-  expiresAt: z.date(),
-  createdAt: z.date(),
-});
-
-export const LogoutBodySchema = RefreshTokenBodySchema;
-
-export const GoogleAuthStateSchema = DeviceSchema.pick({
-  userAgent: true,
-  ip: true,
-});
-
-export const GetAuthorizationUrlSchema = z.object({
-  url: z.string().url(),
-});
-
-export const ForgotPasswordBodySchema = z
-  .object({
-    email: z.string().email(),
-    code: z.string().length(6),
-    newPassword: z.string().min(6).max(100),
-    confirmNewPassword: z.string().min(6).max(100),
-  })
-  .strict()
-  .superRefine(({ confirmNewPassword, newPassword }, ctx) => {
-    if (confirmNewPassword != newPassword) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Password do not match ConfirmPassword',
-        path: ['confirmNewPassword'],
-      });
-    }
-  });
-
-export const DisableTwoFactorBodySchema = z
-  .object({
-    totpCode: z.string().length(6).optional(), //2FA code
-    code: z.string().length(6).optional(), // Email OTP code
-  })
-  .strict()
-  .superRefine(({ totpCode, code }, ctx) => {
-    // Nếu cả 2 đều có hoặc không có
-    if ((totpCode != undefined) === (code != undefined)) {
-      ctx.addIssue({
-        path: ['totpCode'],
-        message: 'Have to provide otp or 2FA code',
-        code: 'custom',
-      });
-      ctx.addIssue({
-        path: ['code'],
-        message: 'Have to provide otp or 2FA code',
-        code: 'custom',
-      });
-    }
-  });
-
-export const TwoFactorSetupResSchema = z.object({
-  secret: z.string(),
-  uri: z.string(),
 });
 
 export type RegisterBodyType = z.infer<typeof RegisterBodySchema>;
@@ -162,15 +81,5 @@ export type VerificationCodeType = z.infer<typeof VerificationCodeSchema>;
 export type SendOTPBodyType = z.infer<typeof SendOTPBodySchema>;
 export type LoginBodyType = z.infer<typeof LoginBodySchema>;
 export type LoginResType = z.infer<typeof LoginResSchema>;
-export type RefreshTokenType = z.infer<typeof RefreshTokenSchema>;
-export type RefreshTokenBodyType = z.infer<typeof RefreshTokenBodySchema>;
+
 export type RefreshTokenResType = LoginResType;
-export type DeviceType = z.infer<typeof DeviceSchema>;
-export type LogoutBodyType = RefreshTokenBodyType;
-export type GoogleAuthStateType = z.infer<typeof GoogleAuthStateSchema>;
-export type GetAuthorizationUrlType = z.infer<typeof GetAuthorizationUrlSchema>;
-export type ForgotPasswordBodyType = z.infer<typeof ForgotPasswordBodySchema>;
-export type DisableTwoFactorBodyType = z.infer<
-  typeof DisableTwoFactorBodySchema
->;
-export type TwoFactorSetupResType = z.infer<typeof TwoFactorSetupResSchema>;
