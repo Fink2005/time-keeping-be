@@ -46,6 +46,7 @@ async function bootstrap() {
       `http://localhost:${envConfig.PORT}`,
       'http://localhost:3000',
       'http://20.17.97.172:5432',
+      'https://api.tira.click/',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
