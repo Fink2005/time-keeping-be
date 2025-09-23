@@ -15,6 +15,11 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U tira-postgres -d tira-db -h localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   jenkins:
     image: jenkins/jenkins:lts
@@ -22,13 +27,13 @@ services:
     restart: always
     env_file:
       - .env
-    user: root                   # để Jenkins có quyền mount docker.sock
+    user: root # để Jenkins có quyền mount docker.sock
     ports:
       - '8080:8080'
       - '50000:50000'
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock  # mount Docker host
+      - /var/run/docker.sock:/var/run/docker.sock # mount Docker host
     networks:
       - app-network
 
@@ -39,7 +44,7 @@ services:
     container_name: tira-container
     restart: always
     env_file:
-      - /home/checkingapp/tira/.env  
+      - /home/checkingapp/tira/.env
     ports:
       - '8888:8888'
     depends_on:
@@ -50,6 +55,7 @@ services:
 volumes:
   pgdata:
   jenkins_home:
+
 
 networks:
   app-network:
