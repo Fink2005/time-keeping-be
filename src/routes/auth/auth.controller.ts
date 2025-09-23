@@ -1,8 +1,7 @@
-import { Body, Controller, Ip, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { ZodSerializerDto } from 'nestjs-zod';
 import { IsPublic } from 'src/shared/decorators/auth.decorator';
-import { UserAgent } from 'src/shared/decorators/user-agent.decorator';
 import {
   LoginBodyDTO,
   LoginResDTO,
@@ -10,14 +9,10 @@ import {
   RegisterResDTO,
 } from './auth.dto';
 import { AuthService } from './auth.service';
-import { GoogleService } from './google.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly googleService: GoogleService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   @IsPublic()
@@ -27,26 +22,13 @@ export class AuthController {
     return this.authService.register(body);
   }
 
-  // @Post('otp')
-  // @IsPublic()
-  // @ZodSerializerDto(MessageResDTO)
-  // sendOTP(@Body() body: SendOTPBodyDTO) {
-  //   return this.authService.sendTOP(body);
-  // }
-
   @Post('login')
   @IsPublic()
   @ZodSerializerDto(LoginResDTO)
   @ApiResponse({ status: 201, type: LoginResDTO })
-  login(
-    @Body() body: LoginBodyDTO,
-    @UserAgent() userAgent: string,
-    @Ip() ip: string,
-  ) {
+  login(@Body() body: LoginBodyDTO) {
     return this.authService.login({
       ...body,
-      userAgent,
-      ip,
     });
   }
 
@@ -70,63 +52,5 @@ export class AuthController {
   // @ZodSerializerDto(MessageResDTO)
   // logout(@Body() body: RefreshTokenBodyDTO) {
   //   return this.authService.logout(body.refreshToken);
-  // }
-
-  // @Get('google-link')
-  // @IsPublic()
-  // @ZodSerializerDto(GetAuthorizationUrlResDTO)
-  // getGoogleLink(@UserAgent() userAgent: string, @Ip() ip: string) {
-  //   return this.googleService.geAuthorizationUrl({ userAgent, ip });
-  // }
-
-  // @Get('google/callback')
-  // @IsPublic()
-  // async googleCallback(
-  //   @Query('code') code: string,
-  //   @Query('state') state: string,
-  //   @Res() res: Response,
-  // ) {
-  //   try {
-  //     const data = await this.googleService.googleCallback({ code, state });
-  //     return res.redirect(
-  //       `${envConfig.GOOGLE_CLIENT_REDIRECT_URI}?accessToken=${data.accessToken}&refreshToken=${data.refreshToken}`,
-  //     );
-  //   } catch (error) {
-  //     const message =
-  //       error instanceof Error
-  //         ? error.message
-  //         : 'Login using Google failure, please try again';
-  //     return res.redirect(
-  //       `${envConfig.GOOGLE_CLIENT_REDIRECT_URI}?errorMessage=${message}`,
-  //     );
-  //   }
-  // }
-
-  // @Post('forgot-password')
-  // @IsPublic()
-  // @ZodSerializerDto(MessageResDTO)
-  // forgotPassword(@Body() body: ForgotPasswordBodyDTO) {
-  //   return this.authService.forgotPassword(body);
-  // }
-
-  // @Post('2fa/setup')
-  // @ZodSerializerDto(TwoFactorSetupResDTO)
-  // setupTwoFactorAuth(
-  //   @Body() _: EmptyBodyDTO,
-  //   @ActivateUser('userId') userId: number,
-  // ) {
-  //   return this.authService.setupTwoFactorAuth(userId);
-  // }
-
-  // @Post('2fa/disable')
-  // @ZodSerializerDto(MessageResDTO)
-  // disableTwoFactorAuth(
-  //   @Body() body: DisableTwoFactorBodyDTO,
-  //   @ActivateUser('userId') userId: number,
-  // ) {
-  //   return this.authService.disableTwoFactorAuth({
-  //     ...body,
-  //     userId,
-  //   });
   // }
 }
