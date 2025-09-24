@@ -33,7 +33,9 @@ export class AttendanceService {
     }
     //Lưu thêm locationId
 
-    // const result = await this.attendanceRepository.createAttendance(body);
+    // const result = await this.attendanceRepository.createAttendance({
+    //   ...body
+    // });
   }
 
   getLastedStatus(data: { userId: number }) {

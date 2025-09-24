@@ -13,9 +13,11 @@ export class AttendanceRepository {
     });
   }
 
-  // createAttendance(payload: Partial<Omit<AttendanceType, 'id'>>) {
-  //   return this.prismaService.location.create({
-  //     data: payload,
-  //   });
-  // }
+  createAttendance(
+    payload: Omit<AttendanceType, 'id'>,
+  ): Promise<AttendanceType> {
+    return this.prismaService.attendance.create({
+      data: payload,
+    });
+  }
 }
