@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 export const RegisterBodySchema = UserSchema.pick({
   email: true,
+  name: true,
 })
   .extend({
     confirmPassword: z.string().min(6).max(100),
@@ -48,26 +49,26 @@ export const LoginBodySchema = UserSchema.pick({
   email: true,
 })
   .extend({
-    totpCode: z.string().length(6).optional(), //2FA code
-    code: z.string().length(6).optional(), // Email OTP code
+    // totpCode: z.string().length(6).optional(), //2FA code
+    // code: z.string().length(6).optional(), // Email OTP code
     password: z.string().min(6).max(100),
   })
-  .strict()
-  .superRefine(({ totpCode, code }, ctx) => {
-    if (totpCode !== undefined && code !== undefined) {
-      //Nếu truyền cùng lúc 2 cái sẽ báo về client
-      ctx.addIssue({
-        path: ['totpCode'],
-        message: 'Have to provide otp or 2FA code',
-        code: 'custom',
-      });
-      ctx.addIssue({
-        path: ['code'],
-        message: 'Have to provide otp or 2FA code',
-        code: 'custom',
-      });
-    }
-  });
+  .strict();
+// .superRefine(({ totpCode, code }, ctx) => {
+//   if (totpCode !== undefined && code !== undefined) {
+//     //Nếu truyền cùng lúc 2 cái sẽ báo về client
+//     ctx.addIssue({
+//       path: ['totpCode'],
+//       message: 'Have to provide otp or 2FA code',
+//       code: 'custom',
+//     });
+//     ctx.addIssue({
+//       path: ['code'],
+//       message: 'Have to provide otp or 2FA code',
+//       code: 'custom',
+//     });
+//   }
+// });
 
 export const LoginResSchema = UserSchema.pick({
   refreshToken: true,

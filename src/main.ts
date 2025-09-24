@@ -2,6 +2,7 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import { patchNestJsSwagger } from 'nestjs-zod';
 import envConfig from 'src/shared/config';
 import { AppModule } from './app.module';
 async function bootstrap() {
@@ -9,22 +10,13 @@ async function bootstrap() {
 
   app.use(cookieParser());
   // ✅ Swagger setup (optional if using @nestjs/swagger)
+  patchNestJsSwagger();
   const config = new DocumentBuilder()
     .setTitle('Tira-checking API')
     .setDescription('Tira-checking API with JWT tokens')
     .setVersion('1.0')
     .addTag('Products', 'Product related endpoints')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'Bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth',
-    )
+    .addBearerAuth()
     // Thêm nhiều server để chọn
     .addServer(`http://localhost:${envConfig.PORT}`, 'Local development server')
     .addServer('https://api.tira.click', 'Production API')

@@ -8,7 +8,7 @@ import { VerificationCodeType } from './auth.model';
 export class AuthRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createUser(user: Pick<UserType, 'email'>): Promise<UserType> {
+  async createUser(user: Pick<UserType, 'email' | 'name'>): Promise<UserType> {
     return this.prismaService.user.create({
       data: user,
     });
