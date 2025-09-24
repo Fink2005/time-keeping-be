@@ -1,17 +1,17 @@
-import { APIKeyGuard } from './api-key.guard';
-import { AccessTokenGuard } from './access-token.guard';
-import { Reflector } from '@nestjs/core';
 import {
   CanActivate,
   ExecutionContext,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { AuthType, ConditionGuard } from '../constants/auth.constant';
 import {
   AUTH_TYPE_KEY,
   AuthTypeDecoratorPayload,
 } from '../decorators/auth.decorator';
-import { AuthType, ConditionGuard } from '../constants/auth.constant';
+import { AccessTokenGuard } from './access-token.guard';
+import { APIKeyGuard } from './api-key.guard';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {

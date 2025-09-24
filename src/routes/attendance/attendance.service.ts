@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { isNotFoundPrismaError } from 'src/shared/helpers';
+import { PaginationQueryType } from 'src/shared/models/request.model';
 import {
   InvalidLocationException,
   LocationNotFoundException,
 } from '../location/location.error';
 import { LocationRepository } from './../location/location.repo';
+import { InvalidTypeAttendanceException } from './attendance.error';
 import { CheckAttendanceBodyType } from './attendance.model';
 import { AttendanceRepository } from './attendance.repo';
 
@@ -21,24 +24,41 @@ export class AttendanceService {
     userId: number;
     body: CheckAttendanceBodyType;
   }) {
-    let location = null;
-    //Kiểm tra xem locationId có hợp lệ
-    if (body.locationId) {
-      location = await this.locationRepository.getLocationById({
-        id: body.locationId,
+    try {
+      let location = null;
+      //Kiểm tra xem locationId có hợp lệ
+      if (body.locationId) {
+        location = await this.locationRepository.getLocationById({
+          id: body.locationId,
+        });
+
+        if (!location) throw LocationNotFoundException;
+        if (location.userId !== userId) throw InvalidLocationException;
+      }
+
+      //Kiểm tra type có hợp lệ
+
+      const lastestAttendance =
+        await this.attendanceRepository.getLastestAttendance({ userId });
+      if (lastestAttendance?.type === body.type)
+        throw InvalidTypeAttendanceException;
+
+      //Lưu thêm locationId
+      return await this.attendanceRepository.createAttendance({
+        ...body,
+        userId,
       });
-
-      if (!location) throw LocationNotFoundException;
-      if (location.userId !== userId) throw InvalidLocationException;
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) throw LocationNotFoundException;
+      throw error;
     }
-    //Lưu thêm locationId
+  }
 
-    // const result = await this.attendanceRepository.createAttendance({
-    //   ...body
-    // });
+  getAttendances(userId: number, pagination: PaginationQueryType) {
+    return this.attendanceRepository.getAttendances(userId, pagination);
   }
 
   getLastedStatus(data: { userId: number }) {
-    return this.attendanceRepository.getLastedStatus(data);
+    return this.attendanceRepository.getLastestAttendance(data);
   }
 }

@@ -3,14 +3,16 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ZodSerializerInterceptor } from 'nestjs-zod';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AttendanceModule } from './routes/attendance/attendance.module';
 import { AuthModule } from './routes/auth/auth.module';
+import { LocationModule } from './routes/location/location.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
 import CustomZodValidationPipe from './shared/pipes/custom-zod-validation.pipe';
 import { SharedModule } from './shared/shared.module';
 // import { CatchEverythingFilter } from './shared/filters/catch-everything.filter'
 
 @Module({
-  imports: [SharedModule, AuthModule],
+  imports: [SharedModule, AuthModule, AttendanceModule, LocationModule],
   controllers: [AppController],
   providers: [
     AppService,
