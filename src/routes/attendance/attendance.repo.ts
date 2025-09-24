@@ -6,7 +6,9 @@ import { PrismaService } from 'src/shared/services/prisma.service';
 export class AttendanceRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  getLastedStatus(data: { userId: number }): Promise<AttendanceType | null> {
+  getLastestAttendance(data: {
+    userId: number;
+  }): Promise<AttendanceType | null> {
     return this.prismaService.attendance.findFirst({
       where: data,
       orderBy: { createdAt: 'desc' },
@@ -14,10 +16,12 @@ export class AttendanceRepository {
   }
 
   createAttendance(
-    payload: Omit<AttendanceType, 'id'>,
+    payload: Omit<AttendanceType, 'id' | 'createdAt'>,
   ): Promise<AttendanceType> {
     return this.prismaService.attendance.create({
-      data: payload,
+      data: {
+        ...payload,
+      },
     });
   }
 }

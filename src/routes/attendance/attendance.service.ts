@@ -4,6 +4,7 @@ import {
   LocationNotFoundException,
 } from '../location/location.error';
 import { LocationRepository } from './../location/location.repo';
+import { InvalidTypeAttendanceException } from './attendance.error';
 import { CheckAttendanceBodyType } from './attendance.model';
 import { AttendanceRepository } from './attendance.repo';
 
@@ -31,14 +32,22 @@ export class AttendanceService {
       if (!location) throw LocationNotFoundException;
       if (location.userId !== userId) throw InvalidLocationException;
     }
-    //Lưu thêm locationId
 
-    // const result = await this.attendanceRepository.createAttendance({
-    //   ...body
-    // });
+    //Kiểm tra type có hợp lệ
+
+    const lastestAttendance =
+      await this.attendanceRepository.getLastestAttendance({ userId });
+    if (lastestAttendance?.type === body.type)
+      throw InvalidTypeAttendanceException;
+
+    //Lưu thêm locationId
+    return await this.attendanceRepository.createAttendance({
+      ...body,
+      userId,
+    });
   }
 
   getLastedStatus(data: { userId: number }) {
-    return this.attendanceRepository.getLastedStatus(data);
+    return this.attendanceRepository.getLastestAttendance(data);
   }
 }
