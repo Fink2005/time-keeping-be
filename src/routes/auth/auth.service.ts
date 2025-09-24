@@ -79,6 +79,7 @@ export class AuthService {
       if (result?.data?.data?.email) {
         await this.authRepository.createUser({
           email: result.data.data.email,
+          name: body.name,
         });
       }
       return {
