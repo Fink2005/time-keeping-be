@@ -11,7 +11,7 @@ CREATE TYPE "public"."AttendanceStatus" AS ENUM ('CHECK_IN', 'CHECK_OUT');
 CREATE TABLE "public"."User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
-    "name" VARCHAR(500),
+    "name" VARCHAR(500) NOT NULL,
     "phoneNumber" VARCHAR(50),
     "avatar" VARCHAR(1000),
     "refreshToken" VARCHAR(1000),
@@ -27,9 +27,9 @@ CREATE TABLE "public"."User" (
 CREATE TABLE "public"."Location" (
     "id" SERIAL NOT NULL,
     "name" VARCHAR(255) NOT NULL,
-    "lat" DECIMAL(9,6) NOT NULL,
-    "lng" DECIMAL(9,6) NOT NULL,
-    "address" VARCHAR(500),
+    "lat" TEXT NOT NULL,
+    "lng" TEXT NOT NULL,
+    "address" VARCHAR(500) NOT NULL,
     "radius" INTEGER NOT NULL DEFAULT 50,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -41,10 +41,10 @@ CREATE TABLE "public"."Location" (
 -- CreateTable
 CREATE TABLE "public"."Attendance" (
     "id" SERIAL NOT NULL,
-    "lat" DECIMAL(9,6) NOT NULL,
-    "lng" DECIMAL(9,6) NOT NULL,
+    "lat" TEXT NOT NULL,
+    "lng" TEXT NOT NULL,
     "address" VARCHAR(500) NOT NULL,
-    "radius" INTEGER NOT NULL,
+    "radius" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "type" "public"."AttendanceStatus" NOT NULL,
     "imageUri" TEXT,
