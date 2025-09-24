@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { isNotFoundPrismaError } from 'src/shared/helpers';
+import { PaginationQueryType } from 'src/shared/models/request.model';
 import {
   InvalidLocationException,
   LocationNotFoundException,
@@ -22,29 +24,38 @@ export class AttendanceService {
     userId: number;
     body: CheckAttendanceBodyType;
   }) {
-    let location = null;
-    //Kiểm tra xem locationId có hợp lệ
-    if (body.locationId) {
-      location = await this.locationRepository.getLocationById({
-        id: body.locationId,
+    try {
+      let location = null;
+      //Kiểm tra xem locationId có hợp lệ
+      if (body.locationId) {
+        location = await this.locationRepository.getLocationById({
+          id: body.locationId,
+        });
+
+        if (!location) throw LocationNotFoundException;
+        if (location.userId !== userId) throw InvalidLocationException;
+      }
+
+      //Kiểm tra type có hợp lệ
+
+      const lastestAttendance =
+        await this.attendanceRepository.getLastestAttendance({ userId });
+      if (lastestAttendance?.type === body.type)
+        throw InvalidTypeAttendanceException;
+
+      //Lưu thêm locationId
+      return await this.attendanceRepository.createAttendance({
+        ...body,
+        userId,
       });
-
-      if (!location) throw LocationNotFoundException;
-      if (location.userId !== userId) throw InvalidLocationException;
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) throw LocationNotFoundException;
+      throw error;
     }
+  }
 
-    //Kiểm tra type có hợp lệ
-
-    const lastestAttendance =
-      await this.attendanceRepository.getLastestAttendance({ userId });
-    if (lastestAttendance?.type === body.type)
-      throw InvalidTypeAttendanceException;
-
-    //Lưu thêm locationId
-    return await this.attendanceRepository.createAttendance({
-      ...body,
-      userId,
-    });
+  getAttendances(userId: number, pagination: PaginationQueryType) {
+    return this.attendanceRepository.getAttendances(userId, pagination);
   }
 
   getLastedStatus(data: { userId: number }) {
