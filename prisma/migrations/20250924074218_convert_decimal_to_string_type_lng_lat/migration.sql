@@ -1,7 +1,0 @@
--- AlterTable
-ALTER TABLE "public"."Attendance" ALTER COLUMN "lat" SET DATA TYPE TEXT,
-ALTER COLUMN "lng" SET DATA TYPE TEXT;
-
--- AlterTable
-ALTER TABLE "public"."Location" ALTER COLUMN "lat" SET DATA TYPE TEXT,
-ALTER COLUMN "lng" SET DATA TYPE TEXT;

@@ -10,7 +10,7 @@ datasource db {
 model User {
   id           Int     @id @default(autoincrement())
   email        String  @unique
-  name         String? @db.VarChar(500)
+  name         String  @db.VarChar(500)
   phoneNumber  String? @db.VarChar(50)
   avatar       String? @db.VarChar(1000) //scalar type
   refreshToken String? @db.VarChar(1000) //scalar type
@@ -30,9 +30,9 @@ model User {
 model Location {
   id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(255) // VD: Công ty A, Cửa hàng B
-  lat       Decimal  @db.Decimal(9, 6)
-  lng       Decimal  @db.Decimal(9, 6)
-  address   String?  @db.VarChar(500)
+  lat       String
+  lng       String
+  address   String   @db.VarChar(500)
   radius    Int      @default(50) // bán kính check-in cho phép
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -45,10 +45,10 @@ model Location {
 
 model Attendance {
   id        Int              @id @default(autoincrement())
-  lat       Decimal          @db.Decimal(9, 6)
-  lng       Decimal          @db.Decimal(9, 6)
+  lat       String
+  lng       String
   address   String           @db.VarChar(500)
-  radius    Int
+  radius    Int?
   createdAt DateTime         @default(now())
   type      AttendanceStatus
   imageUri  String?

@@ -6,12 +6,12 @@ export const AttendanceSchema = z.object({
   lat: z.string(),
   lng: z.string(),
   address: z.string().max(500),
-  radius: z.number().nullable().default(null),
+  radius: z.number().nullable().optional().default(null),
   createdAt: z.date(),
   type: z.nativeEnum(AttendanceStatus),
-  imageUri: z.string().url().nullable().default(null),
+  imageUri: z.string().url().nullable().optional().default(null),
   userId: z.number().int(),
-  locationId: z.number().nullable().default(null),
+  locationId: z.number().nullable().optional().default(null),
 });
 
 export type AttendanceType = z.infer<typeof AttendanceSchema>;
