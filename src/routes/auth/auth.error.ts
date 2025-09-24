@@ -30,14 +30,14 @@ export const FailedToSendOTPException = new UnprocessableEntityException([
 // Email related errors
 export const EmailAlreadyExistsException = new UnprocessableEntityException([
   {
-    message: 'Error.EmailAlreadyExists',
+    message: 'Email đã tồn tại',
     path: 'email',
   },
 ]);
 
 export const EmailNotFoundException = new UnprocessableEntityException([
   {
-    message: 'Error.EmailNotFound',
+    message: 'Không tìm thấy Email',
     path: 'email',
   },
 ]);
@@ -45,7 +45,7 @@ export const EmailNotFoundException = new UnprocessableEntityException([
 // Password related errors
 export const InvalidPasswordException = new UnprocessableEntityException([
   {
-    message: 'Error.InvalidPassword',
+    message: 'Password không đúng',
     path: 'password',
   },
 ]);
@@ -55,7 +55,7 @@ export const RefreshTokenAlreadyUsedException = new UnauthorizedException(
   'Error.RefreshTokenAlreadyUsed',
 );
 export const UnauthorizedAccessException = new UnauthorizedException(
-  'Error.UnauthorizedAccess',
+  'Không có quyền truy cập',
 );
 
 // Google auth related errors
