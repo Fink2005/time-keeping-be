@@ -9,7 +9,9 @@
     "module": "commonjs",
     "jsx": "react-jsx",
     "types": [
-      "react"
+      "react",
+      "node",
+      "Multer"
     ],
     "declaration": true,
     "removeComments": true,
@@ -27,7 +29,7 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
   },
   "ts-node": {
     "require": [

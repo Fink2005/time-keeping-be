@@ -1,6 +1,8 @@
 import { HttpModule } from '@nestjs/axios';
 import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { APIKeyGuard } from './guards/api-key.guard';
 import { AuthenticationGuard } from './guards/authentication.guard';
@@ -18,6 +20,7 @@ const sharedServices = [
   SharedUserRepository,
   EmailService,
   AuthApisService,
+  CloudinaryService,
 ];
 
 @Global() // global mode
@@ -32,6 +35,6 @@ const sharedServices = [
     },
   ],
   exports: sharedServices, // global mode phải có exports
-  imports: [JwtModule, HttpModule], //JwtModule là 1module, nên phải imports ở đây
+  imports: [JwtModule, HttpModule, CloudinaryModule], //JwtModule là 1module, nên phải imports ở đây
 })
 export class SharedModule {}

@@ -28,6 +28,10 @@ const conifgSchema = z.object({
 
   OTP_EXPIRES_IN: z.string(),
   RESEND_API_KEY: z.string(),
+
+  CLOUDINARY_NAME: z.string(),
+  API_CLOUDINARY_KEY: z.string(),
+  API_CLOUDINARY_SECRET: z.string(),
 });
 
 const configServer = conifgSchema.safeParse(process.env);

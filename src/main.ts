@@ -15,7 +15,6 @@ async function bootstrap() {
     .setTitle('Tira-checking API')
     .setDescription('Tira-checking API with JWT tokens')
     .setVersion('1.0')
-    .addTag('Products', 'Product related endpoints')
     .addBearerAuth()
     // Thêm nhiều server để chọn
     .addServer(`http://localhost:${envConfig.PORT}`, 'Local development server')
