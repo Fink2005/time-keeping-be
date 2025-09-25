@@ -5,8 +5,8 @@ import { ActivateUser } from 'src/shared/decorators/activate-user.decorator';
 import { PaginationQueryDTO } from 'src/shared/dtos/request.dto';
 import {
   CheckAttendanceBodyDTO,
-  CreatedAttendanceDTO,
   GetAttendancesDTO,
+  GetDetailAttendanceDTO,
   LastedStatusResDTO,
 } from './attendance.dto';
 import { AttendanceService } from './attendance.service';
@@ -17,8 +17,8 @@ export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 
   @Post('check-attendance')
-  @ZodSerializerDto(CreatedAttendanceDTO)
-  @ApiResponse({ status: 200, type: CreatedAttendanceDTO })
+  @ZodSerializerDto(GetDetailAttendanceDTO)
+  @ApiResponse({ status: 201, type: GetDetailAttendanceDTO })
   checkAttendance(
     @Body() body: CheckAttendanceBodyDTO,
     @ActivateUser('userId') userId: number,
@@ -38,6 +38,7 @@ export class AttendanceController {
 
   @Get('lasted-status')
   @ZodSerializerDto(LastedStatusResDTO)
+  @ApiResponse({ status: 200, type: LastedStatusResDTO })
   getLastedStatus(@ActivateUser('userId') userId: number) {
     return this.attendanceService.getLastedStatus({ userId });
   }

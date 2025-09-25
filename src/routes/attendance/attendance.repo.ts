@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PaginationQueryType } from 'src/shared/models/request.model';
 import { AttendanceType } from 'src/shared/models/shared-attendance.model';
 import { PrismaService } from 'src/shared/services/prisma.service';
-import { CreatedAttendanceType, GetAttendancesType } from './attendance.model';
+import {
+  GetAttendancesType,
+  GetDetailAttendanceType,
+} from './attendance.model';
 
 @Injectable()
 export class AttendanceRepository {
@@ -48,6 +51,7 @@ export class AttendanceRepository {
         },
       }),
     ]);
+
     return {
       data,
       totalItems,
@@ -59,7 +63,7 @@ export class AttendanceRepository {
 
   createAttendance(
     payload: Omit<AttendanceType, 'id' | 'createdAt'>,
-  ): Promise<CreatedAttendanceType> {
+  ): Promise<GetDetailAttendanceType> {
     return this.prismaService.attendance.create({
       data: {
         ...payload,
