@@ -20,8 +20,11 @@ export class LocationRepository {
       },
     });
   }
-  getLocation(uniqueValue: { id: number } | { id: number; userId: number }) {
-    return this.prismaService.location.findUnique({
+
+  getLocation(
+    uniqueValue: { id: number } | { id: number; userId: number },
+  ): Promise<LocationType> {
+    return this.prismaService.location.findUniqueOrThrow({
       where: uniqueValue,
     });
   }

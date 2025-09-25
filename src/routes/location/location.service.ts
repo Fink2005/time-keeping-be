@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { isNotFoundPrismaError } from 'src/shared/helpers';
+import { LocationNotFoundException } from './location.error';
 import { CreateLocationBodyType } from './location.model';
 import { LocationRepository } from './location.repo';
 
@@ -16,7 +18,12 @@ export class LocationService {
     return this.locationRepository.createLocation({ userId, body });
   }
 
-  getLocation({ userId, id }: { userId: number; id: number }) {
-    return this.locationRepository.getLocation({ userId, id });
+  async getLocation({ userId, id }: { userId: number; id: number }) {
+    try {
+      return await this.locationRepository.getLocation({ userId, id });
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) throw LocationNotFoundException;
+      throw error;
+    }
   }
 }
