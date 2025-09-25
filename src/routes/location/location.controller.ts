@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ZodSerializerDto } from 'nestjs-zod';
 import { ActivateUser } from 'src/shared/decorators/activate-user.decorator';
@@ -6,6 +6,7 @@ import {
   CreateLocationBodyDTO,
   GetDetailLocationResDTO,
   GetLocationParamsDTO,
+  UpdateLocationBodyDTO,
 } from './location.dto';
 import { LocationService } from './location.service';
 @Controller('location')
@@ -31,5 +32,14 @@ export class LocationController {
     @ActivateUser('userId') userId: number,
   ) {
     return this.locationService.getLocation({ userId, id: Number(params.id) });
+  }
+
+  @Patch('/update')
+  @ApiResponse({ status: 200, type: GetDetailLocationResDTO })
+  updateLocation(
+    @ActivateUser('userId') userId: number,
+    @Body() body: UpdateLocationBodyDTO,
+  ) {
+    return this.locationService.updateLocation({ userId, body });
   }
 }

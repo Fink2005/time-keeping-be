@@ -4,6 +4,7 @@ import {
   CreateLocationBodySchema,
   GetDetailLocationResSchema,
   GetLocationParamsSchema,
+  UpdateLocationBodySchema,
 } from './location.model';
 
 export class CreateLocationBodyDTO extends createZodDto(
@@ -20,3 +21,7 @@ export class GetLocationParamsDTO extends createZodDto(
   @ApiProperty({ default: 5 })
   id: string;
 }
+
+export class UpdateLocationBodyDTO extends createZodDto(
+  UpdateLocationBodySchema,
+) {}

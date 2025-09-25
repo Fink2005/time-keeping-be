@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { isNotFoundPrismaError } from 'src/shared/helpers';
 import { LocationNotFoundException } from './location.error';
-import { CreateLocationBodyType } from './location.model';
+import {
+  CreateLocationBodyType,
+  UpdateLocationBodyType,
+} from './location.model';
 import { LocationRepository } from './location.repo';
 
 @Injectable()
@@ -21,6 +24,27 @@ export class LocationService {
   async getLocation({ userId, id }: { userId: number; id: number }) {
     try {
       return await this.locationRepository.getLocation({ userId, id });
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) throw LocationNotFoundException;
+      throw error;
+    }
+  }
+
+  async updateLocation({
+    userId,
+    body,
+  }: {
+    userId: number;
+    body: UpdateLocationBodyType;
+  }) {
+    try {
+      // Kiểm tra có phải của user đó không
+      const location = await this.locationRepository.getLocation({
+        id: body.id,
+      });
+      if (location.userId !== userId)
+        throw new UnauthorizedException('Không có quyền truy cập');
+      return await this.locationRepository.updateLocation(body);
     } catch (error) {
       if (isNotFoundPrismaError(error)) throw LocationNotFoundException;
       throw error;

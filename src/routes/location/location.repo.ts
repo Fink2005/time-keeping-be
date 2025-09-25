@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { LocationType } from 'src/shared/models/shared-location.model';
 import { PrismaService } from 'src/shared/services/prisma.service';
-import { CreateLocationBodyType } from './location.model';
+import {
+  CreateLocationBodyType,
+  UpdateLocationBodyType,
+} from './location.model';
 @Injectable()
 export class LocationRepository {
   constructor(private readonly prismaService: PrismaService) {}
@@ -26,6 +29,17 @@ export class LocationRepository {
   ): Promise<LocationType> {
     return this.prismaService.location.findUniqueOrThrow({
       where: uniqueValue,
+    });
+  }
+
+  updateLocation(payload: UpdateLocationBodyType): Promise<LocationType> {
+    const { id, name, radius } = payload;
+    return this.prismaService.location.update({
+      where: { id },
+      data: {
+        name,
+        radius,
+      },
     });
   }
 }
