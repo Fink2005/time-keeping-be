@@ -26,7 +26,7 @@ export class AttendanceController {
     return this.attendanceService.checkAttendance({ userId, body });
   }
 
-  @Get('attendances')
+  @Get('list')
   @ZodSerializerDto(GetAttendancesDTO)
   @ApiResponse({ status: 200, type: GetAttendancesDTO })
   getAttendances(

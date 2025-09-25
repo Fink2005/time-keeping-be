@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { isNotFoundPrismaError } from 'src/shared/helpers';
+import { PaginationQueryType } from 'src/shared/models/request.model';
 import { LocationNotFoundException } from './location.error';
 import {
   CreateLocationBodyType,
@@ -67,5 +68,9 @@ export class LocationService {
       if (isNotFoundPrismaError(error)) throw LocationNotFoundException;
       throw error;
     }
+  }
+
+  getLocations(userId: number, pagination: PaginationQueryType) {
+    return this.locationRepository.getLocations(userId, pagination);
   }
 }
