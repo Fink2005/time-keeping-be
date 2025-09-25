@@ -28,19 +28,22 @@ model User {
 }
 
 model Location {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(255) // VD: Công ty A, Cửa hàng B
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255) // VD: Công ty A, Cửa hàng B
   lat       String
   lng       String
-  address   String   @db.VarChar(500)
-  radius    Int      @default(50) // bán kính check-in cho phép
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  address   String    @db.VarChar(500)
+  radius    Int       @default(50) // bán kính check-in cho phép
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   userId Int
   user   User @relation("UserLocation", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   attendances Attendance[] @relation("LocationAttendance") // các chấm công tại địa điểm này 
+
+  @@index([deletedAt])
 }
 
 model Attendance {
@@ -48,7 +51,6 @@ model Attendance {
   lat       String
   lng       String
   address   String           @db.VarChar(500)
-  radius    Int?
   createdAt DateTime         @default(now())
   type      AttendanceStatus
   imageUri  String?
@@ -57,6 +59,9 @@ model Attendance {
 
   Location   Location? @relation("LocationAttendance", fields: [locationId], references: [id], onDelete: SetNull)
   locationId Int?
+  deletedAt  DateTime?
+
+  @@index([deletedAt])
 }
 
 model VerificationCode {

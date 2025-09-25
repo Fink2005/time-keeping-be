@@ -28,7 +28,7 @@ export class AttendanceService {
       let location = null;
       //Kiểm tra xem locationId có hợp lệ
       if (body.locationId) {
-        location = await this.locationRepository.getLocationById({
+        location = await this.locationRepository.getLocation({
           id: body.locationId,
         });
 

@@ -1,8 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import {
   CheckAttendancekBodySchema,
-  CreatedAttendanceSchema,
   GetAttendancesSchema,
+  GetDetailAttendanceSchema,
   LastedStatusResSchema,
 } from './attendance.model';
 
@@ -12,6 +12,6 @@ export class CheckAttendanceBodyDTO extends createZodDto(
 
 export class GetAttendancesDTO extends createZodDto(GetAttendancesSchema) {}
 export class LastedStatusResDTO extends createZodDto(LastedStatusResSchema) {}
-export class CreatedAttendanceDTO extends createZodDto(
-  CreatedAttendanceSchema,
+export class GetDetailAttendanceDTO extends createZodDto(
+  GetDetailAttendanceSchema,
 ) {}
