@@ -1,4 +1,7 @@
-import { UnprocessableEntityException } from '@nestjs/common';
+import {
+  UnauthorizedException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 
 export const LocationNotFoundException = new UnprocessableEntityException([
   {
@@ -13,3 +16,7 @@ export const InvalidLocationException = new UnprocessableEntityException([
     path: 'location',
   },
 ]);
+
+export const UnauthorizedAccessException = new UnauthorizedException(
+  'Không có quyền truy cập',
+);

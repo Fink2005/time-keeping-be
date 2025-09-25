@@ -8,7 +8,15 @@ export const CreateLocationBodySchema = LocationSchema.pick({
   address: true,
   radius: true,
 }).strict();
+
 export const GetDetailLocationResSchema = LocationSchema;
+
+export const UpdateLocationBodySchema = LocationSchema.pick({
+  id: true,
+  name: true,
+  radius: true,
+});
+
 export const GetLocationParamsSchema = z
   .object({
     id: z.string().max(10),
@@ -20,3 +28,4 @@ export type GetDetailLocationResType = z.infer<
   typeof GetDetailLocationResSchema
 >;
 export type GetLocationParamsType = z.infer<typeof GetLocationParamsSchema>;
+export type UpdateLocationBodyType = z.infer<typeof UpdateLocationBodySchema>;
