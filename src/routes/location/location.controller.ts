@@ -1,7 +1,16 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ZodSerializerDto } from 'nestjs-zod';
 import { ActivateUser } from 'src/shared/decorators/activate-user.decorator';
+import { MessageResDTO } from 'src/shared/dtos/response.dto';
 import {
   CreateLocationBodyDTO,
   GetDetailLocationResDTO,
@@ -41,5 +50,17 @@ export class LocationController {
     @Body() body: UpdateLocationBodyDTO,
   ) {
     return this.locationService.updateLocation({ userId, body });
+  }
+
+  @Delete('/:id')
+  @ApiResponse({ status: 200, type: MessageResDTO })
+  deleteLocation(
+    @Param() params: GetLocationParamsDTO,
+    @ActivateUser('userId') userId: number,
+  ) {
+    return this.locationService.deleteLocation({
+      id: Number(params.id),
+      userId,
+    });
   }
 }
