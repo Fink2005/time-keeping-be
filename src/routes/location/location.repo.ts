@@ -42,4 +42,10 @@ export class LocationRepository {
       },
     });
   }
+
+  deleteLocation(id: number) {
+    return this.prismaService.location.delete({
+      where: { id },
+    });
+  }
 }

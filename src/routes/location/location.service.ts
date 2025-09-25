@@ -50,4 +50,22 @@ export class LocationService {
       throw error;
     }
   }
+
+  async deleteLocation({ userId, id }: { userId: number; id: number }) {
+    try {
+      // Kiểm tra có phải của user đó không
+      const location = await this.locationRepository.getLocation({
+        id,
+      });
+      if (location.userId !== userId)
+        throw new UnauthorizedException('Không có quyền truy cập');
+      await this.locationRepository.deleteLocation(id);
+      return {
+        message: ' Xóa địa điểm thành công',
+      };
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) throw LocationNotFoundException;
+      throw error;
+    }
+  }
 }
