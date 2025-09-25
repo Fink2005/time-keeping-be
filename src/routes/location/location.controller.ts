@@ -6,15 +6,18 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ZodSerializerDto } from 'nestjs-zod';
 import { ActivateUser } from 'src/shared/decorators/activate-user.decorator';
+import { PaginationQueryDTO } from 'src/shared/dtos/request.dto';
 import { MessageResDTO } from 'src/shared/dtos/response.dto';
 import {
   CreateLocationBodyDTO,
   GetDetailLocationResDTO,
   GetLocationParamsDTO,
+  GetLocationsDTO,
   UpdateLocationBodyDTO,
 } from './location.dto';
 import { LocationService } from './location.service';
@@ -33,16 +36,6 @@ export class LocationController {
     return this.locationService.createLocation({ userId, body });
   }
 
-  @Get('/:id')
-  @ZodSerializerDto(GetDetailLocationResDTO)
-  @ApiResponse({ status: 200, type: GetDetailLocationResDTO })
-  getLocation(
-    @Param() params: GetLocationParamsDTO,
-    @ActivateUser('userId') userId: number,
-  ) {
-    return this.locationService.getLocation({ userId, id: Number(params.id) });
-  }
-
   @Patch('/update')
   @ApiResponse({ status: 200, type: GetDetailLocationResDTO })
   updateLocation(
@@ -50,6 +43,16 @@ export class LocationController {
     @Body() body: UpdateLocationBodyDTO,
   ) {
     return this.locationService.updateLocation({ userId, body });
+  }
+
+  @Get('list')
+  @ZodSerializerDto(GetLocationsDTO)
+  @ApiResponse({ status: 200, type: GetLocationsDTO })
+  getLocations(
+    @Query() pagination: PaginationQueryDTO,
+    @ActivateUser('userId') userId: number,
+  ) {
+    return this.locationService.getLocations(userId, pagination);
   }
 
   @Delete('/:id')
@@ -62,5 +65,15 @@ export class LocationController {
       id: Number(params.id),
       userId,
     });
+  }
+
+  @Get('/:id')
+  @ZodSerializerDto(GetDetailLocationResDTO)
+  @ApiResponse({ status: 200, type: GetDetailLocationResDTO })
+  getLocation(
+    @Param() params: GetLocationParamsDTO,
+    @ActivateUser('userId') userId: number,
+  ) {
+    return this.locationService.getLocation({ userId, id: Number(params.id) });
   }
 }

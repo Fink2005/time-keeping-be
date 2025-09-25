@@ -4,6 +4,7 @@ import {
   CreateLocationBodySchema,
   GetDetailLocationResSchema,
   GetLocationParamsSchema,
+  GetLocationsSchema,
   UpdateLocationBodySchema,
 } from './location.model';
 
@@ -25,3 +26,5 @@ export class GetLocationParamsDTO extends createZodDto(
 export class UpdateLocationBodyDTO extends createZodDto(
   UpdateLocationBodySchema,
 ) {}
+
+export class GetLocationsDTO extends createZodDto(GetLocationsSchema) {}

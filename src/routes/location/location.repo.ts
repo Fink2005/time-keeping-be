@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { PaginationQueryType } from 'src/shared/models/request.model';
 import { LocationType } from 'src/shared/models/shared-location.model';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import {
   CreateLocationBodyType,
+  GetLocationsType,
   UpdateLocationBodyType,
 } from './location.model';
 @Injectable()
@@ -47,5 +49,39 @@ export class LocationRepository {
     return this.prismaService.location.delete({
       where: { id },
     });
+  }
+
+  async getLocations(
+    userId: number,
+    pagination: PaginationQueryType,
+  ): Promise<GetLocationsType> {
+    const skip = (pagination.page - 1) * pagination.limit;
+    const take = pagination.limit;
+
+    const [totalItems, data] = await Promise.all([
+      this.prismaService.location.count({
+        where: {
+          userId,
+        },
+      }),
+      this.prismaService.location.findMany({
+        where: {
+          userId,
+        },
+        skip,
+        take,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+    ]);
+
+    return {
+      data,
+      totalItems,
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(totalItems / pagination.limit),
+    };
   }
 }
