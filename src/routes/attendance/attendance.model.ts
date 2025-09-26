@@ -27,6 +27,16 @@ export const GetAttendancesSchema = z.object({
 });
 
 export const LastedStatusResSchema = AttendanceSchema;
+export const AttendanceByYearSchema = z.object({
+  data: z.array(
+    z.object({
+      month: z.number(),
+      checkIn: z.number(),
+      checkOut: z.number(),
+      pairs: z.number(),
+    }),
+  ),
+});
 
 export type CheckAttendanceBodyType = z.infer<
   typeof CheckAttendancekBodySchema
@@ -36,3 +46,4 @@ export type LastedStatusResType = z.infer<typeof LastedStatusResSchema>;
 export type GetAttendancesType = z.infer<typeof GetAttendancesSchema>;
 
 export type GetDetailAttendanceType = z.infer<typeof GetDetailAttendanceSchema>;
+export type AttendanceByYearType = z.infer<typeof AttendanceByYearSchema>;

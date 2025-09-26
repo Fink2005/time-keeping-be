@@ -68,7 +68,7 @@ export class AttendanceRepository {
     userId: number;
     pagination: PaginationQueryType;
     date: string;
-  }) {
+  }): Promise<GetAttendancesType> {
     const startDate = new Date(`${date}T00:00:00+07:00`);
     const endDate = new Date(`${date}T23:59:59.999+07:00`);
 
@@ -122,7 +122,7 @@ export class AttendanceRepository {
     userId: number;
     month: string;
     year: string;
-  }) {
+  }): Promise<AttendanceType[]> {
     const monthStr = month ? month.padStart(2, '0') : '01';
     const endMonthStr = month ? month.padStart(2, '0') : '12';
     const endDay = '31';
@@ -131,6 +131,30 @@ export class AttendanceRepository {
     const endDate = new Date(
       `${year}-${endMonthStr}-${endDay}T23:59:59.999+07:00`,
     );
+
+    return await this.prismaService.attendance.findMany({
+      where: {
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+        userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async getAttendanceByYear({
+    userId,
+    year,
+  }: {
+    userId: number;
+    year: string;
+  }): Promise<AttendanceType[]> {
+    const startDate = new Date(`${year}-01-01T00:00:00+07:00`);
+    const endDate = new Date(`${year}-12-31T23:59:59.999+07:00`);
 
     return await this.prismaService.attendance.findMany({
       where: {
