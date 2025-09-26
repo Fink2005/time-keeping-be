@@ -55,13 +55,18 @@ export class AttendanceService {
     }
   }
 
-  async getAttendanceDetail(userId: number, date: string) {
+  async getAttendanceDetail(
+    userId: number,
+    pagination: PaginationQueryType,
+    date: string,
+  ) {
     const year = date.split('-')[0];
     const month = date.split('-')[1];
-    const dataHistoryByDay = await this.attendanceRepository.getAttendaceByDay(
+    const { data } = await this.attendanceRepository.getAttendaceByDay({
       userId,
+      pagination,
       date,
-    );
+    });
 
     const dataHistoryByYear =
       await this.attendanceRepository.getAttendaceByMonthYear({
@@ -70,7 +75,7 @@ export class AttendanceService {
         year,
       });
 
-    const dataType = dataHistoryByDay.map((item) => item.type);
+    const dataType = data.map((item) => item.type);
 
     const hasBoth =
       dataType.includes(AttendanceStatus.CHECK_IN) &&
@@ -88,7 +93,7 @@ export class AttendanceService {
       }),
     );
 
-    return { dataCalendarAttendace, dataHistoryByDay };
+    return { dataCalendarAttendace, data };
   }
 
   getAttendances(userId: number, pagination: PaginationQueryType) {

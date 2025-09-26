@@ -62,13 +62,14 @@ export class AttendanceController {
     return this.attendanceService.getLastedStatus({ userId });
   }
 
-  @Get('attendance-detail/:date')
+  @Get(':date')
   @ApiResponse({ status: 200, type: GetAttendancesDTO })
   getAttendanceHistory(
     @ActivateUser('userId') userId: number,
+    @Query() pagination: PaginationQueryDTO,
     @Param('date') date: string,
   ) {
-    return this.attendanceService.getAttendanceDetail(userId, date);
+    return this.attendanceService.getAttendanceDetail(userId, pagination, date);
   }
 
   @Post('upload')

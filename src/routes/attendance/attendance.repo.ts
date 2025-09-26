@@ -60,21 +60,58 @@ export class AttendanceRepository {
     };
   }
 
-  async getAttendaceByDay(userId: number, date: string) {
+  async getAttendaceByDay({
+    userId,
+    pagination,
+    date,
+  }: {
+    userId: number;
+    pagination: PaginationQueryType;
+    date: string;
+  }) {
     const startDate = new Date(`${date}T00:00:00+07:00`);
     const endDate = new Date(`${date}T23:59:59.999+07:00`);
-    return await this.prismaService.attendance.findMany({
-      where: {
-        createdAt: {
-          gte: startDate,
-          lte: endDate,
+
+    const skip = (pagination.page - 1) * pagination.limit;
+    const take = pagination.limit;
+
+    const [totalItems, data] = await Promise.all([
+      this.prismaService.attendance.count({
+        where: {
+          userId,
         },
-        userId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+      }),
+
+      this.prismaService.attendance.findMany({
+        where: {
+          createdAt: {
+            gte: startDate,
+            lte: endDate,
+          },
+          userId,
+        },
+        include: {
+          Location: {
+            select: {
+              name: true,
+            },
+          },
+        },
+        skip,
+        take,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+    ]);
+
+    return {
+      data,
+      totalItems,
+      page: pagination.page,
+      limit: pagination.limit,
+      totalPages: Math.ceil(totalItems / pagination.limit),
+    };
   }
 
   async getAttendaceByMonthYear({
