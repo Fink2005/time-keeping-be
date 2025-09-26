@@ -82,7 +82,7 @@ export class AttendanceService {
           {
             selected: true,
             marked: hasBoth,
-            selectedColor: '#22c55e',
+            selectedColor: '#3b82f6',
           },
         ];
       }),
