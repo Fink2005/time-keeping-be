@@ -62,11 +62,12 @@ export class AttendanceService {
   ) {
     const year = date.split('-')[0];
     const month = date.split('-')[1];
-    const { data } = await this.attendanceRepository.getAttendaceByDay({
-      userId,
-      pagination,
-      date,
-    });
+    const { data, totalItems, limit, page, totalPages } =
+      await this.attendanceRepository.getAttendaceByDay({
+        userId,
+        pagination,
+        date,
+      });
 
     const dataHistoryByYear =
       await this.attendanceRepository.getAttendaceByMonthYear({
@@ -93,7 +94,7 @@ export class AttendanceService {
       }),
     );
 
-    return { dataCalendarAttendace, data };
+    return { dataCalendarAttendace, data, totalItems, limit, page, totalPages };
   }
 
   getAttendances(userId: number, pagination: PaginationQueryType) {
