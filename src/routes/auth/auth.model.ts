@@ -70,10 +70,11 @@ export const LoginBodySchema = UserSchema.pick({
 //   }
 // });
 
-export const LoginResSchema = UserSchema.pick({
-  refreshToken: true,
-}).extend({
-  accessToken: z.string(),
+export const LoginResSchema = z.object({
+  tokens: UserSchema.pick({ refreshToken: true }).extend({
+    accessToken: z.string(),
+  }),
+  user: UserSchema,
 });
 
 export const RefreshTokenResSchema = LoginResSchema;

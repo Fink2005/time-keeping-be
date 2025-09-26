@@ -149,7 +149,7 @@ export class AuthService {
           refreshToken: tokens.refreshToken,
         },
       );
-      return tokens;
+      return { tokens, user };
     } catch (error) {
       if (isAxiosError(error))
         throw ApiAcountCenterException(error as AxiosError);

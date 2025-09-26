@@ -20,6 +20,7 @@ import { CloudinaryService } from 'src/shared/cloudinary/cloudinary.service';
 import { ActivateUser } from 'src/shared/decorators/activate-user.decorator';
 import { PaginationQueryDTO } from 'src/shared/dtos/request.dto';
 import {
+  AttendanceByYearDTO,
   CheckAttendanceBodyDTO,
   GetAttendancesDTO,
   GetDetailAttendanceDTO,
@@ -62,16 +63,6 @@ export class AttendanceController {
     return this.attendanceService.getLastedStatus({ userId });
   }
 
-  @Get(':date')
-  @ApiResponse({ status: 200, type: GetAttendancesDTO })
-  getAttendanceHistory(
-    @ActivateUser('userId') userId: number,
-    @Query() pagination: PaginationQueryDTO,
-    @Param('date') date: string,
-  ) {
-    return this.attendanceService.getAttendanceDetail(userId, pagination, date);
-  }
-
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
@@ -88,5 +79,24 @@ export class AttendanceController {
   })
   uploadImage(@UploadedFile() file: Express.Multer.File) {
     return this.cloudinaryService.uploadFile(file);
+  }
+
+  @Get(':date')
+  @ApiResponse({ status: 200, type: GetAttendancesDTO })
+  getAttendanceHistory(
+    @ActivateUser('userId') userId: number,
+    @Query() pagination: PaginationQueryDTO,
+    @Param('date') date: string,
+  ) {
+    return this.attendanceService.getAttendanceDetail(userId, pagination, date);
+  }
+
+  @Get('/attendance-by-year/:year')
+  @ApiResponse({ status: 200, type: AttendanceByYearDTO })
+  getAttendanceByYear(
+    @ActivateUser('userId') userId: number,
+    @Param('year') year: string,
+  ) {
+    return this.attendanceService.getAttendanceByYear(userId, year);
   }
 }

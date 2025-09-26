@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { AttendanceStatus } from '@prisma/client';
 import { handleDateFormated, isNotFoundPrismaError } from 'src/shared/helpers';
 import { PaginationQueryType } from 'src/shared/models/request.model';
+
+import { AttendanceStatus } from 'src/shared/constants/attendance.constant';
 import {
   InvalidLocationException,
   LocationNotFoundException,
@@ -96,6 +97,36 @@ export class AttendanceService {
     );
 
     return { dataCalendarAttendace, data, ...rest };
+  }
+
+  async getAttendanceByYear(userId: number, year: string) {
+    const dataHistoryByYear =
+      await this.attendanceRepository.getAttendanceByYear({ userId, year });
+
+    // Kết quả mỗi tháng
+    const monthlySummary = Array.from({ length: 12 }, (_, i) => ({
+      month: i + 1,
+      checkIn: 0,
+      checkOut: 0,
+      pairs: 0,
+    }));
+
+    // Gom dữ liệu
+    dataHistoryByYear.forEach((att) => {
+      const month = new Date(att.createdAt).getMonth(); // 0-11
+      if (att.type === AttendanceStatus.CHECK_IN) {
+        monthlySummary[month].checkIn++;
+      } else if (att.type === AttendanceStatus.CHECK_OUT) {
+        monthlySummary[month].checkOut++;
+      }
+    });
+
+    // Đếm số cặp (min giữa checkIn và checkOut)
+    monthlySummary.forEach((m) => {
+      m.pairs = Math.min(m.checkIn, m.checkOut);
+    });
+
+    return { data: monthlySummary };
   }
 
   getAttendances(userId: number, pagination: PaginationQueryType) {

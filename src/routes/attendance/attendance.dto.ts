@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import {
+  AttendanceByYearSchema,
   CheckAttendancekBodySchema,
   GetAttendancesSchema,
   GetDetailAttendanceSchema,
@@ -15,3 +16,5 @@ export class LastedStatusResDTO extends createZodDto(LastedStatusResSchema) {}
 export class GetDetailAttendanceDTO extends createZodDto(
   GetDetailAttendanceSchema,
 ) {}
+
+export class AttendanceByYearDTO extends createZodDto(AttendanceByYearSchema) {}
