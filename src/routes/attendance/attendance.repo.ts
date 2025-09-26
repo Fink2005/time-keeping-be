@@ -6,7 +6,6 @@ import {
   GetAttendancesType,
   GetDetailAttendanceType,
 } from './attendance.model';
-
 @Injectable()
 export class AttendanceRepository {
   constructor(private readonly prismaService: PrismaService) {}
@@ -59,6 +58,55 @@ export class AttendanceRepository {
       limit: pagination.limit,
       totalPages: Math.ceil(totalItems / pagination.limit),
     };
+  }
+
+  async getAttendaceByDay(userId: number, date: string) {
+    const startDate = new Date(`${date}T00:00:00+07:00`);
+    const endDate = new Date(`${date}T23:59:59.999+07:00`);
+    return await this.prismaService.attendance.findMany({
+      where: {
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+        userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async getAttendaceByMonthYear({
+    userId,
+    month,
+    year,
+  }: {
+    userId: number;
+    month: string;
+    year: string;
+  }) {
+    const monthStr = month ? month.padStart(2, '0') : '01';
+    const endMonthStr = month ? month.padStart(2, '0') : '12';
+    const endDay = '31';
+
+    const startDate = new Date(`${year}-${monthStr}-01T00:00:00+07:00`);
+    const endDate = new Date(
+      `${year}-${endMonthStr}-${endDay}T23:59:59.999+07:00`,
+    );
+
+    return await this.prismaService.attendance.findMany({
+      where: {
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+        userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
   }
 
   createAttendance(

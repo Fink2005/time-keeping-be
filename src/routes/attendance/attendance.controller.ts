@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
   UploadedFile,
@@ -59,6 +60,15 @@ export class AttendanceController {
   @ApiResponse({ status: 200, type: LastedStatusResDTO })
   getLastedStatus(@ActivateUser('userId') userId: number) {
     return this.attendanceService.getLastedStatus({ userId });
+  }
+
+  @Get('attendance-detail/:date')
+  @ApiResponse({ status: 200, type: GetAttendancesDTO })
+  getAttendanceHistory(
+    @ActivateUser('userId') userId: number,
+    @Param('date') date: string,
+  ) {
+    return this.attendanceService.getAttendanceDetail(userId, date);
   }
 
   @Post('upload')

@@ -1,5 +1,6 @@
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { randomInt } from 'crypto';
+import { format } from 'date-fns';
 
 export const isUniqueConstraintPrismaError = (
   error: any,
@@ -19,4 +20,8 @@ export const isNotFoundPrismaError = (
 
 export const generateOTP = (): string => {
   return String(randomInt(0, 1000000)).padStart(6, '0');
+};
+
+export const handleDateFormated = (date: Date) => {
+  return format(new Date(date), 'yyyy-MM-dd');
 };
