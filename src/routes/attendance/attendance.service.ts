@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { isNotFoundPrismaError } from 'src/shared/helpers';
+import { AttendanceStatus } from '@prisma/client';
+import { handleDateFormated, isNotFoundPrismaError } from 'src/shared/helpers';
 import { PaginationQueryType } from 'src/shared/models/request.model';
 import {
   InvalidLocationException,
@@ -52,6 +53,42 @@ export class AttendanceService {
       if (isNotFoundPrismaError(error)) throw LocationNotFoundException;
       throw error;
     }
+  }
+
+  async getAttendanceDetail(userId: number, date: string) {
+    const year = date.split('-')[0];
+    const month = date.split('-')[1];
+    const dataHistoryByDay = await this.attendanceRepository.getAttendaceByDay(
+      userId,
+      date,
+    );
+
+    const dataHistoryByYear =
+      await this.attendanceRepository.getAttendaceByMonthYear({
+        userId,
+        month,
+        year,
+      });
+
+    const dataType = dataHistoryByDay.map((item) => item.type);
+
+    const hasBoth =
+      dataType.includes(AttendanceStatus.CHECK_IN) &&
+      dataType.includes(AttendanceStatus.CHECK_OUT);
+    const dataCalendarAttendace = Object.fromEntries(
+      dataHistoryByYear.map((item) => {
+        return [
+          handleDateFormated(item.createdAt),
+          {
+            selected: true,
+            marked: hasBoth,
+            selectedColor: '#22c55e',
+          },
+        ];
+      }),
+    );
+
+    return { dataCalendarAttendace, dataHistoryByDay };
   }
 
   getAttendances(userId: number, pagination: PaginationQueryType) {
