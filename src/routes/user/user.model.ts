@@ -1,14 +1,21 @@
 import { UserSchema } from 'src/shared/models/shared-user.model';
 import z from 'zod';
 
-export const GetUserSchema = UserSchema.omit({
+export const UserResSchema = UserSchema.omit({
   refreshToken: true,
 });
 
 export const CreateUserSchema = UserSchema.pick({
   email: true,
   keycloakId: true,
-});
+}).strict();
+
+export const UpdateUserSchema = UserSchema.pick({
+  name: true,
+  phoneNumber: true,
+  avatar: true,
+  status: true,
+}).strict();
 
 export const AuthRequestSchema = z
   .object({
@@ -23,7 +30,8 @@ export const AuthResSchema = z.object({
   // user: UserSchema,
 });
 
-export type GetUserType = z.infer<typeof GetUserSchema>;
+export type UserResType = z.infer<typeof UserResSchema>;
 export type AuthRequestType = z.infer<typeof AuthRequestSchema>;
 export type CreateUserType = z.infer<typeof CreateUserSchema>;
 export type AuthResType = z.infer<typeof AuthResSchema>;
+export type UpdateUserType = z.infer<typeof UpdateUserSchema>;

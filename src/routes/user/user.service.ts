@@ -7,6 +7,7 @@ import { NotFoundRecordException } from 'src/shared/error';
 import { TokenService } from 'src/shared/services/token.service';
 import { AccessTokenPayloadCreate } from 'src/shared/types/jwt.type';
 import { ApiAcountCenterException } from './user.error';
+import { UpdateUserType } from './user.model';
 import { UserRepository } from './user.repo';
 
 @Injectable()
@@ -63,5 +64,9 @@ export class UserService {
     ]);
 
     return { accessToken, refreshToken };
+  }
+
+  updateUser({ userId, body }: { userId: number; body: UpdateUserType }) {
+    return this.userRepository.updateUser({ id: userId }, body);
   }
 }
