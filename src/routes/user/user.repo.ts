@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { UserType } from 'src/shared/models/shared-user.model';
 import { PrismaService } from 'src/shared/services/prisma.service';
-import { CreateUserType, GetUserType } from './user.model';
+import { UserResDTO } from './user.dto';
+import { CreateUserType } from './user.model';
 
 @Injectable()
 export class UserRepository {
   constructor(private readonly prismaService: PrismaService) {}
 
-  getProfile(userId: number): Promise<GetUserType | null> {
+  getProfile(userId: number): Promise<UserResDTO | null> {
     return this.prismaService.user.findFirst({
       where: { id: userId },
       omit: {

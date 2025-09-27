@@ -1,8 +1,13 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ZodSerializerDto } from 'nestjs-zod';
 import { ActivateUser } from 'src/shared/decorators/activate-user.decorator';
-import { AuthRequestDto, AuthResDTO, GetUserDTO } from './user.dto';
+import {
+  AuthRequestDto,
+  AuthResDTO,
+  UpdateUserDTO,
+  UserResDTO,
+} from './user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -11,8 +16,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('profile')
-  @ZodSerializerDto(GetUserDTO)
-  @ApiResponse({ status: 200, type: GetUserDTO })
+  @ZodSerializerDto(UserResDTO)
+  @ApiResponse({ status: 200, type: UserResDTO })
   getProfile(@ActivateUser('userId') userId: number) {
     return this.userService.getProfile(userId);
   }
@@ -22,5 +27,14 @@ export class UserController {
   @ApiResponse({ status: 200, type: AuthResDTO })
   auth(@Body() userAuth: AuthRequestDto) {
     return this.userService.auth(userAuth.token);
+  }
+
+  @Put('update')
+  @ApiResponse({ status: 200, type: UserResDTO })
+  updateUser(
+    @ActivateUser('userId') userId: number,
+    @Body() body: UpdateUserDTO,
+  ) {
+    return this.userService.updateUser({ userId, body });
   }
 }
