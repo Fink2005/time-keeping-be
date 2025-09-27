@@ -4,8 +4,8 @@ import { UserStatus } from '../constants/auth.constant';
 export const UserSchema = z.object({
   id: z.number(),
   email: z.string().email(),
-
-  name: z.string().min(1).max(20),
+  keycloakId: z.string(),
+  name: z.string().min(1).max(20).nullable(),
   phoneNumber: z.string().min(10).max(15).nullable(),
   refreshToken: z.string().nullable(),
   avatar: z.string().nullable(),

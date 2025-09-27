@@ -4,7 +4,6 @@ import { ZodSerializerInterceptor } from 'nestjs-zod';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AttendanceModule } from './routes/attendance/attendance.module';
-import { AuthModule } from './routes/auth/auth.module';
 import { LocationModule } from './routes/location/location.module';
 import { UserModule } from './routes/user/user.module';
 import { HttpExceptionFilter } from './shared/filters/http-exception.filter';
@@ -15,7 +14,7 @@ import { SharedModule } from './shared/shared.module';
 @Module({
   imports: [
     SharedModule,
-    AuthModule,
+    // AuthModule,
     AttendanceModule,
     LocationModule,
     UserModule,
