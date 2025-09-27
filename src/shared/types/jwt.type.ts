@@ -1,5 +1,6 @@
 export interface AccessTokenPayloadCreate {
   userId: number;
+  keycloakId: string;
 }
 
 export interface AccessTokenPayload extends AccessTokenPayloadCreate {

@@ -7,7 +7,6 @@ import { AccessTokenGuard } from './guards/access-token.guard';
 import { APIKeyGuard } from './guards/api-key.guard';
 import { AuthenticationGuard } from './guards/authentication.guard';
 import { SharedUserRepository } from './repositories/shared-user.repo';
-import { AuthApisService } from './services/apis.service';
 import { EmailService } from './services/email.service';
 import { HashingService } from './services/hashing.service';
 import { PrismaService } from './services/prisma.service';
@@ -19,7 +18,6 @@ const sharedServices = [
   TokenService,
   SharedUserRepository,
   EmailService,
-  AuthApisService,
   CloudinaryService,
 ];
 
@@ -33,8 +31,8 @@ const sharedServices = [
       provide: 'APP_GUARD',
       useClass: AuthenticationGuard,
     },
-  ],
-  exports: sharedServices, // global mode phải có exports
-  imports: [JwtModule, HttpModule, CloudinaryModule], //JwtModule là 1module, nên phải imports ở đây
+  ], // global mode phải có exports
+  exports: [...sharedServices, HttpModule], // nhớ export HttpModule để chỗ khác dùng HttpService
+  imports: [JwtModule, HttpModule, CloudinaryModule, HttpModule], //JwtModule là 1module, nên phải imports ở đây
 })
 export class SharedModule {}

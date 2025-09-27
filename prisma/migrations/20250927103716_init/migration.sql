@@ -11,11 +11,12 @@ CREATE TYPE "public"."AttendanceStatus" AS ENUM ('CHECK_IN', 'CHECK_OUT');
 CREATE TABLE "public"."User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
-    "name" VARCHAR(500) NOT NULL,
+    "name" VARCHAR(500),
+    "keycloakId" TEXT NOT NULL,
     "phoneNumber" VARCHAR(50),
     "avatar" VARCHAR(1000),
     "refreshToken" VARCHAR(1000),
-    "status" "public"."UserStatus" NOT NULL DEFAULT 'INACTIVE',
+    "status" "public"."UserStatus" NOT NULL DEFAULT 'ACTIVE',
     "deletedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -33,6 +34,7 @@ CREATE TABLE "public"."Location" (
     "radius" INTEGER NOT NULL DEFAULT 50,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
     "userId" INTEGER NOT NULL,
 
     CONSTRAINT "Location_pkey" PRIMARY KEY ("id")
@@ -44,12 +46,12 @@ CREATE TABLE "public"."Attendance" (
     "lat" TEXT NOT NULL,
     "lng" TEXT NOT NULL,
     "address" VARCHAR(500) NOT NULL,
-    "radius" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "type" "public"."AttendanceStatus" NOT NULL,
     "imageUri" TEXT,
     "userId" INTEGER NOT NULL,
     "locationId" INTEGER,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Attendance_pkey" PRIMARY KEY ("id")
 );
@@ -70,7 +72,16 @@ CREATE TABLE "public"."VerificationCode" (
 CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_keycloakId_key" ON "public"."User"("keycloakId");
+
+-- CreateIndex
 CREATE INDEX "User_deletedAt_idx" ON "public"."User"("deletedAt");
+
+-- CreateIndex
+CREATE INDEX "Location_deletedAt_idx" ON "public"."Location"("deletedAt");
+
+-- CreateIndex
+CREATE INDEX "Attendance_deletedAt_idx" ON "public"."Attendance"("deletedAt");
 
 -- CreateIndex
 CREATE INDEX "VerificationCode_expiresAt_idx" ON "public"."VerificationCode"("expiresAt");

@@ -10,12 +10,13 @@ datasource db {
 model User {
   id           Int     @id @default(autoincrement())
   email        String  @unique
-  name         String  @db.VarChar(500)
+  name         String? @db.VarChar(500)
+  keycloakId   String  @unique
   phoneNumber  String? @db.VarChar(50)
   avatar       String? @db.VarChar(1000) //scalar type
   refreshToken String? @db.VarChar(1000) //scalar type
 
-  status UserStatus @default(INACTIVE)
+  status UserStatus @default(ACTIVE)
 
   deletedAt DateTime?
   createdAt DateTime  @default(now())
