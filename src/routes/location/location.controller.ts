@@ -27,6 +27,8 @@ export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
   // @Get()
+  // @ZodSerializerDto(GetLocationsResDTO)
+  // @ApiResponse({ status: 200, type: GetLocationsResDTO })
   // search(@Query() query: SearchLocationQueryDTO) {}
 
   @Post('create')

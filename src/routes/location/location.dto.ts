@@ -1,9 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { createZodDto } from 'nestjs-zod';
 import {
   CreateLocationBodySchema,
   GetDetailLocationResSchema,
   GetLocationParamsSchema,
+  GetLocationsResSchema,
   GetLocationsSchema,
   SearchLocationQuerySchema,
   UpdateLocationBodySchema,
@@ -32,4 +33,9 @@ export class GetLocationsDTO extends createZodDto(GetLocationsSchema) {}
 
 export class SearchLocationQueryDTO extends createZodDto(
   SearchLocationQuerySchema,
-) {}
+) {
+  @ApiPropertyOptional({ description: 'Từ khoá tìm kiếm' })
+  keyword?: string;
+}
+
+export class GetLocationsResDTO extends createZodDto(GetLocationsResSchema) {}

@@ -112,7 +112,7 @@ export class AttendanceService {
       checkIn: 0,
       checkOut: 0,
       pairs: 0,
-      initialDate: `2025-${i + 1 < 10 ? `0${i + 1}` : i + 1}-${currentMonth === `0${i + 1}` ? currentDay : '01'}`,
+      initialDate: `${i + 1 < 10 ? `0${i + 1}` : i + 1}-${currentMonth === `0${i + 1}` ? currentDay : '01'}`,
     }));
 
     // Gom dữ liệu
