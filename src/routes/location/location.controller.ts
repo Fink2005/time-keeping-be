@@ -18,6 +18,8 @@ import {
   GetDetailLocationResDTO,
   GetLocationParamsDTO,
   GetLocationsDTO,
+  GetLocationsResDTO,
+  SearchLocationQueryDTO,
   UpdateLocationBodyDTO,
 } from './location.dto';
 import { LocationService } from './location.service';
@@ -26,10 +28,15 @@ import { LocationService } from './location.service';
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
-  // @Get()
-  // @ZodSerializerDto(GetLocationsResDTO)
-  // @ApiResponse({ status: 200, type: GetLocationsResDTO })
-  // search(@Query() query: SearchLocationQueryDTO) {}
+  @Get()
+  @ZodSerializerDto(GetLocationsResDTO)
+  @ApiResponse({ status: 200, type: GetLocationsResDTO })
+  search(
+    @Query() query: SearchLocationQueryDTO,
+    @ActivateUser('userId') userId: number,
+  ) {
+    return this.locationService.search({ userId, query });
+  }
 
   @Post('create')
   @ZodSerializerDto(GetDetailLocationResDTO)

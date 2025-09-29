@@ -4,6 +4,7 @@ import { PaginationQueryType } from 'src/shared/models/request.model';
 import { LocationNotFoundException } from './location.error';
 import {
   CreateLocationBodyType,
+  SearchLocationQueryType,
   UpdateLocationBodyType,
 } from './location.model';
 import { LocationRepository } from './location.repo';
@@ -72,5 +73,19 @@ export class LocationService {
 
   getLocations(userId: number, pagination: PaginationQueryType) {
     return this.locationRepository.getLocations(userId, pagination);
+  }
+
+  async search({
+    userId,
+    query,
+  }: {
+    userId: number;
+    query: SearchLocationQueryType;
+  }) {
+    const result = await this.locationRepository.findLocationsByName({
+      userId,
+      query,
+    });
+    return { data: result };
   }
 }
