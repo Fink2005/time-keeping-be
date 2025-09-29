@@ -78,7 +78,7 @@ export class AttendanceService {
         year,
       });
 
-    const dataType = data.map((item) => item.type);
+    const dataType = dataHistoryByYear.map((item) => item.type);
 
     const hasBoth =
       dataType.includes(AttendanceStatus.CHECK_IN) &&

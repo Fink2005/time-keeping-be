@@ -31,6 +31,10 @@ export const GetLocationsSchema = z.object({
   totalPages: z.number(), // Tổng số trang
 });
 
+export const SearchLocationQuerySchema = z.object({
+  keyword: z.string().optional(),
+});
+
 export type CreateLocationBodyType = z.infer<typeof CreateLocationBodySchema>;
 export type GetDetailLocationResType = z.infer<
   typeof GetDetailLocationResSchema
@@ -38,3 +42,4 @@ export type GetDetailLocationResType = z.infer<
 export type GetLocationParamsType = z.infer<typeof GetLocationParamsSchema>;
 export type UpdateLocationBodyType = z.infer<typeof UpdateLocationBodySchema>;
 export type GetLocationsType = z.infer<typeof GetLocationsSchema>;
+export type SearchLocationQueryType = z.infer<typeof SearchLocationQuerySchema>;
