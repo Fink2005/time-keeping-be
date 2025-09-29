@@ -8,6 +8,7 @@ export const AttendanceSchema = z.object({
   address: z.string().max(500),
   createdAt: z.date(),
   type: z.nativeEnum(AttendanceStatus),
+  note: z.string().max(500).nullable().optional().default(null),
   imageUri: z.string().url().nullable().optional().default(null),
   userId: z.number(),
   locationId: z.number().nullable().optional().default(null),

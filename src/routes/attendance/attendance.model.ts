@@ -8,6 +8,7 @@ export const CheckAttendancekBodySchema = AttendanceSchema.pick({
   type: true,
   imageUri: true,
   locationId: true,
+  note: true,
 }).strict();
 
 export const GetDetailAttendanceSchema = AttendanceSchema.extend({
