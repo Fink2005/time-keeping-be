@@ -26,6 +26,9 @@ import { LocationService } from './location.service';
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
+  // @Get()
+  // search(@Query() query: SearchLocationQueryDTO) {}
+
   @Post('create')
   @ZodSerializerDto(GetDetailLocationResDTO)
   @ApiResponse({ status: 201, type: GetDetailLocationResDTO })
