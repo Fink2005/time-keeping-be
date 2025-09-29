@@ -103,12 +103,16 @@ export class AttendanceService {
     const dataHistoryByYear =
       await this.attendanceRepository.getAttendanceByYear({ userId, year });
 
+    const currentDay = String(new Date().getDate()).padStart(2, '0');
+    const currentMonth = String(new Date().getMonth() + 1).padStart(2, '0');
+
     // Kết quả mỗi tháng
     const monthlySummary = Array.from({ length: 12 }, (_, i) => ({
       month: i + 1,
       checkIn: 0,
       checkOut: 0,
       pairs: 0,
+      initialDate: `2025-${i + 1 < 10 ? `0${i + 1}` : i + 1}-${currentMonth === `0${i + 1}` ? currentDay : '01'}`,
     }));
 
     // Gom dữ liệu

@@ -34,6 +34,7 @@ export const AttendanceByYearSchema = z.object({
       checkIn: z.number(),
       checkOut: z.number(),
       pairs: z.number(),
+      initialDate: z.string(),
     }),
   ),
 });
