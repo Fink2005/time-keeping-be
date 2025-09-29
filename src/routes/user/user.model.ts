@@ -8,6 +8,7 @@ export const UserResSchema = UserSchema.omit({
 export const CreateUserSchema = UserSchema.pick({
   email: true,
   keycloakId: true,
+  name: true,
 }).strict();
 
 export const UpdateUserSchema = UserSchema.pick({
@@ -20,6 +21,7 @@ export const UpdateUserSchema = UserSchema.pick({
 export const AuthRequestSchema = z
   .object({
     token: z.string(),
+    name: z.string().optional(),
   })
   .strict();
 
@@ -27,7 +29,9 @@ export const AuthResSchema = z.object({
   tokens: UserSchema.pick({ refreshToken: true }).extend({
     accessToken: z.string(),
   }),
-  // user: UserSchema,
+  user: UserSchema.omit({
+    refreshToken: true,
+  }),
 });
 
 export type UserResType = z.infer<typeof UserResSchema>;

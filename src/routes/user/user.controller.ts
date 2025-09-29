@@ -26,7 +26,7 @@ export class UserController {
   @ZodSerializerDto(AuthResDTO)
   @ApiResponse({ status: 200, type: AuthResDTO })
   auth(@Body() userAuth: AuthRequestDto) {
-    return this.userService.auth(userAuth.token);
+    return this.userService.auth(userAuth);
   }
 
   @Put('update')

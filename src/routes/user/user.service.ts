@@ -7,7 +7,7 @@ import { NotFoundRecordException } from 'src/shared/error';
 import { TokenService } from 'src/shared/services/token.service';
 import { AccessTokenPayloadCreate } from 'src/shared/types/jwt.type';
 import { ApiAcountCenterException } from './user.error';
-import { UpdateUserType } from './user.model';
+import { CreateUserType, UpdateUserType } from './user.model';
 import { UserRepository } from './user.repo';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class UserService {
     return user;
   }
 
-  async auth(token: string) {
+  async auth(userAuth: { token: string; name?: string }) {
     try {
       const urlBackend = envConfig.AUTH_SERVICE_URL;
       const url = `${urlBackend}/user/profile`;
@@ -33,24 +33,30 @@ export class UserService {
         this.httpService.get(url, {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${userAuth.token}`,
           },
         }),
       );
 
       const { email, keycloakId } = respon.data.data;
 
-      const user = await this.userRepository.createUser({
+      const data: CreateUserType = {
         email,
         keycloakId,
-      });
+      };
+
+      if (userAuth.name !== undefined) {
+        data.name = userAuth.name;
+      }
+
+      const user = await this.userRepository.createUser(data);
 
       const tokens = await this.generateTokens({ userId: user.id, keycloakId });
       await this.userRepository.updateUser(
         { id: user.id },
         { refreshToken: tokens.refreshToken },
       );
-      return { tokens };
+      return { tokens, user };
     } catch (error) {
       if (isAxiosError(error)) throw ApiAcountCenterException(error);
       throw error;
