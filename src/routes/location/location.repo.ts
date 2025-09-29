@@ -5,6 +5,7 @@ import { PrismaService } from 'src/shared/services/prisma.service';
 import {
   CreateLocationBodyType,
   GetLocationsType,
+  SearchLocationQueryType,
   UpdateLocationBodyType,
 } from './location.model';
 @Injectable()
@@ -83,5 +84,23 @@ export class LocationRepository {
       limit: pagination.limit,
       totalPages: Math.ceil(totalItems / pagination.limit),
     };
+  }
+
+  findLocationsByName({
+    userId,
+    query,
+  }: {
+    userId: number;
+    query: SearchLocationQueryType;
+  }): Promise<LocationType[]> {
+    return this.prismaService.location.findMany({
+      where: {
+        userId,
+        name: {
+          contains: query.keyword,
+          mode: 'insensitive',
+        },
+      },
+    });
   }
 }
