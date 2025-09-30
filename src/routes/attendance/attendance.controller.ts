@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   UploadedFile,
   UseInterceptors,
@@ -22,9 +23,11 @@ import { PaginationQueryDTO } from 'src/shared/dtos/request.dto';
 import {
   AttendanceByYearDTO,
   CheckAttendanceBodyDTO,
+  GetAttendanceParamsDTO,
   GetAttendancesDTO,
   GetDetailAttendanceDTO,
   LastedStatusResDTO,
+  UpdateAttendanceDTO,
 } from './attendance.dto';
 import { AttendanceService } from './attendance.service';
 
@@ -81,22 +84,51 @@ export class AttendanceController {
     return this.cloudinaryService.uploadFile(file);
   }
 
-  @Get(':date')
-  @ApiResponse({ status: 200, type: GetAttendancesDTO })
-  getAttendanceHistory(
+  @Put('/update')
+  @ZodSerializerDto(GetDetailAttendanceDTO)
+  @ApiResponse({ status: 200, type: GetDetailAttendanceDTO })
+  updateAttendance(
     @ActivateUser('userId') userId: number,
-    @Query() pagination: PaginationQueryDTO,
-    @Param('date') date: string,
+    @Body() body: UpdateAttendanceDTO,
   ) {
-    return this.attendanceService.getAttendanceDetail(userId, pagination, date);
+    return this.attendanceService.updateAttendance({ userId, body });
   }
 
   @Get('/attendance-by-year/:year')
+  @ZodSerializerDto(AttendanceByYearDTO)
   @ApiResponse({ status: 200, type: AttendanceByYearDTO })
   getAttendanceByYear(
     @ActivateUser('userId') userId: number,
     @Param('year') year: string,
   ) {
     return this.attendanceService.getAttendanceByYear(userId, year);
+  }
+
+  @Get('/:id')
+  @ZodSerializerDto(GetDetailAttendanceDTO)
+  @ApiResponse({ status: 200, type: GetDetailAttendanceDTO })
+  getAttendance(
+    @ActivateUser('userId') userId: number,
+    @Param() param: GetAttendanceParamsDTO,
+  ) {
+    return this.attendanceService.getAttendanceDetail({
+      userId,
+      id: Number(param.id),
+    });
+  }
+
+  @Get('/history/:date')
+  @ZodSerializerDto(GetAttendancesDTO)
+  @ApiResponse({ status: 200, type: GetAttendancesDTO })
+  getAttendanceHistory(
+    @ActivateUser('userId') userId: number,
+    @Query() pagination: PaginationQueryDTO,
+    @Param('date') date: string,
+  ) {
+    return this.attendanceService.getAttendanceByMonth(
+      userId,
+      pagination,
+      date,
+    );
   }
 }

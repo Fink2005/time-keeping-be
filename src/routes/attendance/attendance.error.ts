@@ -6,3 +6,10 @@ export const InvalidTypeAttendanceException = new UnprocessableEntityException([
     path: 'attendance',
   },
 ]);
+
+export const AttendanceNotFoundException = new UnprocessableEntityException([
+  {
+    message: 'Error.AttendanceNotFound',
+    path: 'attendance',
+  },
+]);

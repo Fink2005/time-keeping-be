@@ -5,6 +5,7 @@ import { PrismaService } from 'src/shared/services/prisma.service';
 import {
   GetAttendancesType,
   GetDetailAttendanceType,
+  UpdateAttendanceType,
 } from './attendance.model';
 @Injectable()
 export class AttendanceRepository {
@@ -177,6 +178,45 @@ export class AttendanceRepository {
       data: {
         ...payload,
       },
+      include: {
+        Location: {
+          select: { name: true },
+        },
+      },
+    });
+  }
+
+  getAttendanceDetail({
+    userId,
+    id,
+  }: {
+    userId: number;
+    id: number;
+  }): Promise<GetDetailAttendanceType> {
+    return this.prismaService.attendance.findUniqueOrThrow({
+      where: {
+        userId,
+        id,
+      },
+      include: {
+        Location: {
+          select: { name: true },
+        },
+      },
+    });
+  }
+
+  updateAttendance({
+    userId,
+    body,
+  }: {
+    userId: number;
+    body: UpdateAttendanceType;
+  }): Promise<GetDetailAttendanceType> {
+    const { id, note } = body;
+    return this.prismaService.attendance.update({
+      where: { userId, id },
+      data: { note },
       include: {
         Location: {
           select: { name: true },
