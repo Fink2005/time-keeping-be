@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Put } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ZodSerializerDto } from 'nestjs-zod';
 import { ActivateUser } from 'src/shared/decorators/activate-user.decorator';
+import { IsPublic } from 'src/shared/decorators/auth.decorator';
 import {
   AuthRequestDto,
   AuthResDTO,
@@ -23,6 +24,7 @@ export class UserController {
   }
 
   @Post('auth')
+  @IsPublic()
   @ZodSerializerDto(AuthResDTO)
   @ApiResponse({ status: 200, type: AuthResDTO })
   auth(@Body() userAuth: AuthRequestDto) {
