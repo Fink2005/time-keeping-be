@@ -8,8 +8,14 @@ import {
   LocationNotFoundException,
 } from '../location/location.error';
 import { LocationRepository } from './../location/location.repo';
-import { InvalidTypeAttendanceException } from './attendance.error';
-import { CheckAttendanceBodyType } from './attendance.model';
+import {
+  AttendanceNotFoundException,
+  InvalidTypeAttendanceException,
+} from './attendance.error';
+import {
+  CheckAttendanceBodyType,
+  UpdateAttendanceType,
+} from './attendance.model';
 import { AttendanceRepository } from './attendance.repo';
 
 @Injectable()
@@ -56,7 +62,7 @@ export class AttendanceService {
     }
   }
 
-  async getAttendanceDetail(
+  async getAttendanceByMonth(
     userId: number,
     pagination: PaginationQueryType,
     date: string,
@@ -137,7 +143,39 @@ export class AttendanceService {
     return this.attendanceRepository.getAttendances(userId, pagination);
   }
 
-  getLastedStatus(data: { userId: number }) {
-    return this.attendanceRepository.getLastestAttendance(data);
+  async getLastedStatus(data: { userId: number }) {
+    const res = await this.attendanceRepository.getLastestAttendance(data);
+    if (!res) throw AttendanceNotFoundException;
+    return res;
+  }
+
+  async getAttendanceDetail({ userId, id }: { userId: number; id: number }) {
+    try {
+      return await this.attendanceRepository.getAttendanceDetail({
+        userId,
+        id,
+      });
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) throw AttendanceNotFoundException;
+      throw error;
+    }
+  }
+
+  async updateAttendance({
+    userId,
+    body,
+  }: {
+    userId: number;
+    body: UpdateAttendanceType;
+  }) {
+    try {
+      return await this.attendanceRepository.updateAttendance({
+        userId,
+        body,
+      });
+    } catch (error) {
+      if (isNotFoundPrismaError(error)) throw AttendanceNotFoundException;
+      throw error;
+    }
   }
 }
